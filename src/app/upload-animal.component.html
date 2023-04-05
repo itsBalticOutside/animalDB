@@ -5,9 +5,9 @@
     <div class="row">
         <div class="col-sm-12">
             <ng-container>
-                <!--Review Form-->
-                <h2>Leave a review for this game</h2>
-                <form [formGroup]="reviewForm" (ngSubmit)="onSubmit()">
+                <!--Upload Form-->
+                <h2>Enter upload details</h2>
+                <form [formGroup]="uploadForm" (ngSubmit)="onSubmit()">
 
                     <div class="form-group">
                         <label for="Species">Species</label>
@@ -15,6 +15,7 @@
                           <option *ngFor = "let collection of collection_name | async" [value]="collection">{{ collection }}</option>
                         </select>
                     </div>
+                
                       
                     <div class="form-group">
                         <label for="Gender">Gender</label>
@@ -25,7 +26,7 @@
                     </div>
                     <div class="form-group">
                         <label for="LifeStage">LifeStage</label>
-                        <select id="LifeStage" LifeStage="LifeStage" formControlName="LifeStage" class="form-control">
+                        <select id="LifeStage" LifeStage="LifeStage" formControlName="LifeStage" class="form-control" >
                           <option value="Infant">Infant</option>
                           <option value="Adolecent">Adolecent</option>
                           <option value="Adult">Adult</option>
@@ -41,11 +42,12 @@
                     <div class="form-group">
                         <label for="image">Image</label>
                         <input type="text" id="image" image="image" 
-                        class="form-control" formControlName="image">  
+                        class="form-control" formControlName="image">   
                     </div>
                     <br>
+
                     
-                    <button  type="submit" class="btn btn-primary">Submit</button>
+                    <button  type="submit" class="btn btn-primary" [disabled]="!uploadForm.valid">Submit</button>
 
                 </form>  
             </ng-container>

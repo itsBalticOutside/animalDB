@@ -21,7 +21,7 @@ export class UploadAnimalComponent {
 
   animal: any;
   collection_name: any = [];
-  reviewForm: any;
+  uploadForm: any;
 
   constructor(private http: HttpClient,
               private formBuilder: FormBuilder,
@@ -29,7 +29,7 @@ export class UploadAnimalComponent {
 
   ngOnInit(){
      //Building review and edit forms
-    this.reviewForm = this.formBuilder.group({
+    this.uploadForm = this.formBuilder.group({
       Species: ['', Validators.required],
       Gender: ['', Validators.required],
       LifeStage: ['', Validators.required],
@@ -40,11 +40,33 @@ export class UploadAnimalComponent {
     this.collection_name = this.webService.getCollections();
   }
 
-    //submit review button
-    onSubmit(){
-     
-      this.webService.postReview(this.reviewForm.value).subscribe((response:any) =>{});
-      this.reviewForm.reset();
+  //submit review button
+  onSubmit(){
+     if (this.uploadForm.valid){
+      this.webService.postReview(this.uploadForm.value).subscribe((response:any) =>{});
+      this.uploadForm.reset();
+     }
+    
+  }
+
+  //Validation
+  isInvalid(control:any){
+    return this.uploadForm.controls[control].invalid &&
+    this.uploadForm.controls[control].touched;
+  }
+
+      //Validation
+  isUntouched(){
+    return this.uploadForm.controls.Species.pristine || 
+    this.uploadForm.controls.Gender.pristine || 
+    this.uploadForm.controls.LifeStage.pristine || 
+    this.uploadForm.controls.Location.pristine || 
+    this.uploadForm.controls.Image.pristine;
   }
   
+//Validation
+  isIncomplete(){
+    return this.isUntouched();
+  }
+
 }
