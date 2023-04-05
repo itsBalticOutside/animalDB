@@ -49,24 +49,5 @@ export class UploadAnimalComponent {
     
   }
 
-  //Validation
-  isInvalid(control:any){
-    return this.uploadForm.controls[control].invalid &&
-    this.uploadForm.controls[control].touched;
-  }
-
-      //Validation
-  isUntouched(){
-    return this.uploadForm.controls.Species.pristine || 
-    this.uploadForm.controls.Gender.pristine || 
-    this.uploadForm.controls.LifeStage.pristine || 
-    this.uploadForm.controls.Location.pristine || 
-    this.uploadForm.controls.Image.pristine;
-  }
-  
-//Validation
-  isIncomplete(){
-    return this.isUntouched();
-  }
 
 }
