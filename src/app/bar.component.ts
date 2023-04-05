@@ -10,8 +10,10 @@ export class BarComponent {
 
   private svg: any;
   private margin = 50;
-  private width = 750 - (this.margin * 2);
-  private height = 400 - (this.margin * 2);
+  private width = 300 - (this.margin * 2);
+  private height = 300 - (this.margin * 2);
+  private GenderCount = {"Male" : 3,
+                        "Female" : 7}
 
   private createSvg(): void {
     this.svg = d3.select("figure#bar")
@@ -52,17 +54,18 @@ export class BarComponent {
     .enter()
     .append("rect")
     .attr("x", (d: any) => x(d.Gender))
-    .attr("y", (d: any) => y(d.LifeStage))
+    .attr("y", (GenderCount: any) => y(GenderCount))
     .attr("width", x.bandwidth())
-    .attr("height", (d: any) => this.height - y(d.LifeStage))
+    .attr("height", (GenderCount: any) => this.height - y(GenderCount))
     .attr("fill", "#d04a35");
   }
   ngOnInit(): void {
+    
     this.createSvg();
 
     type ChartDataType ={
       Gender: string,
-      LifeStage: string,
+      GenderCount: string,
     }
 
     d3.json('http://localhost:5000/api/v1.0/animals/Deer').then(data=> {
