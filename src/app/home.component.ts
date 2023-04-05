@@ -10,15 +10,7 @@ import { HttpClient } from '@angular/common/http';
     styleUrls: ['./home.component.css']
 })
 export class HomeComponent { 
-
-    animal_list: any = []; 
+ 
     constructor(public authService: AuthService,public http: HttpClient,public webService: WebService) {}
 
-    ngOnInit(){
-        
-        this.animal_list = this.webService.getAnimals();
-    }
-      
-    
-    
 }
