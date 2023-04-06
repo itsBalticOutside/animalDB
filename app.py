@@ -24,15 +24,15 @@ def get_animalCol(collection):
 
     return make_response(jsonify(animals),200)
 
+
 #Get gender count of collection
-@app.route("/api/v1.0/animals/<string:collection>/<string:genderID>")
-def get_genderCount(collection, genderID):
+@app.route("/api/v1.0/animals/<string:collection>/genderCount")
+def get_genderCount(collection):
    
-    gender = genderID.title()
-    genderCount = list(db[collection.title()].aggregate([
-        {'$match': {'Gender': gender}},
-        {'$group': {'_id': gender, 'total': {'$sum': 1}}}
-    ]))
+    pipeline = [    {"$group": {"_id": "$Gender", "genderCount": {"$sum": 1}}}]
+
+    genderCount = list(db[collection.title()].aggregate(pipeline))
+
     return make_response(jsonify(genderCount),200)
 
 #Get collection names
