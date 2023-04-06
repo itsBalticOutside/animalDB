@@ -1,5 +1,7 @@
 import { Component } from '@angular/core';
 import * as d3 from 'd3';
+import { WebService } from "./web.service";
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-bar',
@@ -12,8 +14,12 @@ export class BarComponent {
   private margin = 50;
   private width = 300 - (this.margin * 2);
   private height = 300 - (this.margin * 2);
-  private GenderCount = {"Male" : 3,
-                        "Female" : 7}
+  collection_name: any = [];
+  url: any;
+  animal: any;
+  animal_Data: any;
+
+  constructor(private route: ActivatedRoute, private webService: WebService) { }
 
   private createSvg(): void {
     this.svg = d3.select("figure#bar")
@@ -28,7 +34,7 @@ export class BarComponent {
     // Create the X-axis band scale
     const x = d3.scaleBand()
     .range([0, this.width])
-    .domain(data.map(d => d.Gender))
+    .domain(data.map(d => d._id))
     .padding(0.2);
 
     // Draw the X-axis on the DOM
@@ -53,27 +59,37 @@ export class BarComponent {
     .data(data)
     .enter()
     .append("rect")
-    .attr("x", (d: any) => x(d.Gender))
-    .attr("y", (GenderCount: any) => y(GenderCount))
+    .attr("x", (d: any) => x(d._id))
+    .attr("y", (d: any) => y(d.genderCount))
     .attr("width", x.bandwidth())
-    .attr("height", (GenderCount: any) => this.height - y(GenderCount))
+    .attr("height", (d: any) => this.height - y(d.genderCount))
     .attr("fill", "#d04a35");
   }
+
+
   ngOnInit(): void {
-    
+
+    // Getting Species
+    this.webService.getAnimal(this.route.snapshot.params['id']).subscribe(data => {
+      this.animal_Data = data
+      //Creating url to retreive genderCount
+      this.url = 'http://localhost:5000/api/v1.0/animals/' + this.animal_Data[0]['Species'] 
+        + '/genderCount' 
+
+      //Assinging data and plotting graph, Done inside subscribe{} 
+      // so server has time to retieve data
+      d3.json(this.url).then(data=> {
+        const chartData = data as ChartDataType[];
+        this.drawBars(chartData);
+      });
+    });
+
     this.createSvg();
 
     type ChartDataType ={
       Gender: string,
-      GenderCount: string,
+      GenderCount: number,
     }
-
-    d3.json('http://localhost:5000/api/v1.0/animals/Deer').then(data=> {
-      const chartData = data as ChartDataType[];
-      this.drawBars(chartData);
-  });
-
-
-    
+ 
 }
 }
