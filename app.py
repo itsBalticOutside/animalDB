@@ -3,27 +3,214 @@ from flask import Flask, jsonify, make_response, request
 from flask_cors import CORS
 from pymongo import MongoClient
 from bson import ObjectId
+import bcrypt
+import jwt
+import datetime
+from functools import wraps
 import uuid, random
 
 app = Flask(__name__)
 CORS(app)
 
 client = MongoClient("mongodb://127.0.0.1:27017")
-db = client.AnimalDB
+animalDB = client.AnimalDB
+userDB = client.UserDB
+userCollection = userDB.UserCollection
+blacklist = userDB.blacklist
 
-# Define API endpoints
+#REMEMBER TO CHANGE THE SECERT CODE
+app.config['SECRET_KEY'] = 'mysecret'
+
+# REMINDER HENRY THIS IS NOT YOUR ACTUAL APP.PY THIS IS JUST FOR UPLOADING TO GITHUB
+# PLEASE REMEMBER TO UPDATE THE CODE IN HERE 
+
+def jwt_required(func):
+    @wraps(func)
+    def jwt_required_wrapper(*args, **kwargs):
+        token = None
+        if 'x-access-token' in request.headers:
+            token = request.headers['x-access-token']
+        if not token:
+            return jsonify( {'message' : 'Token is missing'} ), 401
+        try:
+            data = jwt.decode(token, app.config['SECRET_KEY'])
+        except:
+            return jsonify( {'message' : 'Token is invalid'}), 401
+        bl_token = blacklist.find_one({"token":token})
+        if bl_token is not None:
+            return make_response(jsonify( { 'message' : 'Token has been cancelled'}), 401)
+        return func(*args, **kwargs)
+    return jwt_required_wrapper
+    
+    #Use @jwt_required when class needs to have a token to use
+
+@app.route("/api/v1.0/user/login", methods=['GET']) 
+def login() :
+    auth = request.authorization
+    if auth:
+        user = userCollection.find_one( {'username':auth.username} )
+        if user is not None:
+            if bcrypt.checkpw(bytes(auth.password, 'UTF-8'), \
+                              user["password"]):
+                token = jwt.encode( \
+                    {'user' : auth.username,
+                     'admin' : user["admin"],
+                     'exp' : datetime.datetime.utcnow() + \
+                             datetime.timedelta(minutes=30)
+                        }, app.config['SECRET_KEY'])
+                return make_response(jsonify( \
+                   { 'token' : token.decode('UTF-8') } ), 200)
+            else:
+                return make_response(jsonify( \
+                   { 'message':'Bad password' } ), 401)
+        else:
+            return make_response(jsonify( \
+                { 'message':'Bad username' } ), 401)
+    else:
+         return make_response(jsonify( \
+            { 'message':'Authentication Required' } ), 401)
+
+@app.route("/api/v1.0/user/signup", methods=['POST'])
+def signup() :    
+    #Ensuring no missing form fields
+    if "forename" in request.form and \
+        "surname" in request.form and \
+        "username" in request.form and \
+        "email" in request.form and \
+        "admin" in request.form and \
+        "password" in request.form:
+        #Creating new user document
+        new_user = { "forename" : request.form["forename"],
+        "surname" : request.form["surname"],
+        "username" : request.form["username"],
+        "email" : request.form["email"],
+        "admin" : request.form["admin"],
+        "password" : request.form["password"],
+        "Comments" : []
+        }
+
+        #inserting user to mongodb user collection
+        
+        new_user["password"] = bcrypt.hashpw(new_user["password"].encode('utf-8'), bcrypt.gensalt())
+        
+        new_user_id = userDB.UserCollection.insert_one(new_user)
+        #Creating link to user entry so can access quickly
+        new_user_link = "http://localhost:5000/api/v1.0/user/" + str(new_user_id.inserted_id)
+        return make_response(jsonify({"url": new_user_link}), 201)
+
+    else:
+        #Empty form validation
+        return make_response(jsonify({"error":"Missing form data"}),404)
+    
+#Editing user !!CANNOT CHANGE PASSWORD OR ADMIN STATUS IMPLEMENT SEPERATE FUNCTION WITH SECURITY MEASURES
+@app.route("/api/v1.0/user/<string:id>", methods=["PUT"])
+def edit_user(id):
+
+    #Ensuring no missing form fields
+    if "forename" in request.form and \
+        "surname" in request.form and \
+        "username" in request.form and \
+        "email" in request.form :
+        
+       
+        result = userDB.UserCollection.update_one(\
+            { "_id": ObjectId(id) }, {
+                "$set" :{
+                    "forename" : request.form["forename"],
+                    "surname" : request.form["surname"],
+                    "username" : request.form["username"],
+                    "email" : request.form["email"],
+                }
+            } )
+        if result.matched_count == 1:
+            edited_user_link = \
+                "http://localhost:5000/api/v1.0/user/" + id
+            return make_response(jsonify({ "url":edited_user_link}),200)
+        else:
+            return make_response(jsonify({"error":"Invalid user ID"}),404)
+    else:
+        return make_response(jsonify({"error":"Missing form data"}),404)
+
+#Deleting user
+@app.route("/api/v1.0/user/<string:id>", methods=["DELETE"])
+def delete_user(id):
+   
+    user = userDB.UserCollection.find_one({"_id": ObjectId(id)})
+    if user is not None:
+        userDB.UserCollection.delete_one({"_id": ObjectId(id)})
+        return jsonify({"message": "User deleted."}), 200
+    return jsonify({"message": "User not found."}), 404
+
+
+#Get all users
+@app.route("/api/v1.0/user", methods=["GET"])
+def get_users():
+    users = []
+    # Loop through each collection and retrieve all animals
+    
+    users += list(userDB.UserCollection.find())
+    # Convert ObjectId fields to strings
+    for user in users:
+        user["_id"] = str(user["_id"])
+        user["password"] = user["password"].decode('UTF-8')
+    # Return all users as a JSON response
+    return make_response(jsonify(users),200)
+
+#Get Specific user
+@app.route("/api/v1.0/user/<string:id>")
+def get_user(id):
+    # Loop through  collection and find the user with the specified ID
+    user = userDB.UserCollection.find_one({"_id": ObjectId(id)})
+    if user is not None:
+    # Convert ObjectId field to string
+        user["_id"] = str(user["_id"])
+        user["password"] = user["password"].decode('UTF-8')
+        # Return the user as a JSON response
+        return make_response( jsonify( [user] ), 200)
+    # If no user is found, return a 404 error response
+    return make_response( jsonify({"error" : "Invalid user ID"}), 404)
+
+
+@app.route("/api/v1.0/user/logout", methods=['GET'])
+@jwt_required
+def logout():
+    token = request.headers['x-access-token']
+    blacklist.insert_one({"token":token})
+    
+    return make_response( jsonify( { 'message' : 'Logout successful'}), 200)
+
+def admin_required(func):
+    @wraps(func)
+    def admin_required_wrapper(*args, **kwargs):
+        token = request.headers['x-access-token']
+        data = jwt.decode(token, app.config['SECRET_KEY'])
+
+        if data["admin"]:
+            return func(*args, *kwargs)
+        else:
+            return make_response(jsonify( { "message" : "Admin access required"}), 401)
+    return admin_required_wrapper
+
+
+
+# Define API endpoint
+
 #Get collection of animals
 @app.route("/api/v1.0/animals/<string:collection>")
 def get_animalCol(collection):
     
     # Retrieve all animals from the Specific collection
     #.title() is to ensure that for example if "deer" is typed, that it is changed to "Deer" so can find collection
-    animals = list(db[collection.title()].find())
+    animals = list(animalDB[collection.title()].find())
     for animal in animals:
         animal["_id"] = str(animal["_id"])
 
     return make_response(jsonify(animals),200)
 
+
+
+# REMINDER HENRY THIS IS NOT YOUR ACTUAL APP.PY THIS IS JUST FOR UPLOADING TO GITHUB
+# PLEASE REMEMBER TO UPDATE THE CODE IN HERE 
 
 #Get gender count of collection
 @app.route("/api/v1.0/animals/<string:collection>/genderCount")
@@ -31,7 +218,7 @@ def get_genderCount(collection):
    
     pipeline = [    {"$group": {"_id": "$Gender", "genderCount": {"$sum": 1}}}]
 
-    genderCount = list(db[collection.title()].aggregate(pipeline))
+    genderCount = list(animalDB[collection.title()].aggregate(pipeline))
 
     return make_response(jsonify(genderCount),200)
 
@@ -39,7 +226,7 @@ def get_genderCount(collection):
 @app.route("/api/v1.0/collections")
 def get_Col():
     
-    collection_names = db.list_collection_names()
+    collection_names = animalDB.list_collection_names()
 
     return make_response(jsonify(collection_names),200)
 
@@ -48,20 +235,25 @@ def get_Col():
 def get_animals():
     animals = []
     # Loop through each collection and retrieve all animals
-    for collection in db.list_collection_names():
-        animals += list(db[collection].find())
+    for collection in animalDB.list_collection_names():
+        animals += list(animalDB[collection].find())
     # Convert ObjectId fields to strings
     for animal in animals:
         animal["_id"] = str(animal["_id"])
     # Return all animals as a JSON response
     return make_response(jsonify(animals),200)
 
+
+# REMINDER HENRY THIS IS NOT YOUR ACTUAL APP.PY THIS IS JUST FOR UPLOADING TO GITHUB
+# PLEASE REMEMBER TO UPDATE THE CODE IN HERE 
+
+
 #Get Specific animal
 @app.route("/api/v1.0/animal/<string:id>")
 def get_animal(id):
     # Loop through each collection and try to find the animal with the specified ID
-    for collection in db.list_collection_names():
-        animal = db[collection].find_one({"_id": ObjectId(id)})
+    for collection in animalDB.list_collection_names():
+        animal = animalDB[collection].find_one({"_id": ObjectId(id)})
         if animal is not None:
             # Convert ObjectId field to string
             animal["_id"] = str(animal["_id"])
@@ -87,6 +279,11 @@ def show_all_animals():
 
     return make_response(jsonify(data_to_return),200)
 
+
+# REMINDER HENRY THIS IS NOT YOUR ACTUAL APP.PY THIS IS JUST FOR UPLOADING TO GITHUB
+# PLEASE REMEMBER TO UPDATE THE CODE IN HERE 
+
+
 #Uploading animal   
 @app.route("/api/v1.0/animal", methods=["POST"])
 def add_animal():
@@ -109,7 +306,7 @@ def add_animal():
         #Grabbing Species field to identify which animal collection should be added to
         collection = request.form["Species"] 
         #inserting animal to mongodb collection
-        new_animal_id = db[collection.title()].insert_one(new_animal)
+        new_animal_id = animalDB[collection.title()].insert_one(new_animal)
         #Creating link to animals entry so can access quickly
         new_animal_link = "http://localhost:5000/api/v1.0/animal/" + str(new_animal_id.inserted_id)
         return make_response(jsonify({"url": new_animal_link}), 201)
@@ -128,7 +325,7 @@ def edit_animals(id):
         "LifeStage" in request.form and \
         "Location" in request.form:
         collection = request.form["Species"]
-        result = db[collection].update_one(\
+        result = animalDB[collection].update_one(\
             { "_id": ObjectId(id) }, {
                 "$set" :{
                     "Species" : request.form["Species"],
@@ -146,6 +343,12 @@ def edit_animals(id):
     else:
         return make_response(jsonify({"error":"Missing form data"}),404)
 
+
+# REMINDER HENRY THIS IS NOT YOUR ACTUAL APP.PY THIS IS JUST FOR UPLOADING TO GITHUB
+# PLEASE REMEMBER TO UPDATE THE CODE IN HERE 
+
+
+
 #Deleting animal
 @app.route("/api/v1.0/animal/<string:id>", methods=["DELETE"])
 def delete_animal(id):
@@ -154,10 +357,10 @@ def delete_animal(id):
     #Such as /api/v1.0/animals/<string:collection>/<string:id>
     #I decided to go this way as I thought it would be a challenge to implement
     # and it was more convient to only type the ID when looking to delete
-    for collection in db.list_collection_names():
-        animal = db[collection].find_one({"_id": ObjectId(id)})
+    for collection in animalDB.list_collection_names():
+        animal = animalDB[collection].find_one({"_id": ObjectId(id)})
         if animal is not None:
-            db[collection].delete_one({"_id": ObjectId(id)})
+            animalDB[collection].delete_one({"_id": ObjectId(id)})
             return jsonify({"message": "Animal deleted."}), 200
     return jsonify({"message": "Animal not found."}), 404
 
