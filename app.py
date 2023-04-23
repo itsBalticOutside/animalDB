@@ -24,6 +24,7 @@ app.config['SECRET_KEY'] = 'mysecret'
 # REMINDER HENRY THIS IS NOT YOUR ACTUAL APP.PY THIS IS JUST FOR UPLOADING TO GITHUB
 # PLEASE REMEMBER TO UPDATE THE CODE IN HERE 
 
+#Token requiremt decorator 
 def jwt_required(func):
     @wraps(func)
     def jwt_required_wrapper(*args, **kwargs):
@@ -44,8 +45,22 @@ def jwt_required(func):
     
     #Use @jwt_required when class needs to have a token to use
 
-@app.route("/api/v1.0/user/login", methods=['GET']) 
-def login() :
+#Admin requirment decorator 
+def admin_required(func):
+    @wraps(func)
+    def admin_required_wrapper(*args, **kwargs):
+        token = request.headers['x-access-token']
+        data = jwt.decode(token, app.config['SECRET_KEY'])
+
+        if data["admin"]:
+            return func(*args, *kwargs)
+        else:
+            return make_response(jsonify( { "message" : "Admin access required"}), 401)
+    return admin_required_wrapper
+
+
+@app.route("/api/v1.0/user/signin", methods=['GET']) 
+def signin() :
     auth = request.authorization
     if auth:
         user = userCollection.find_one( {'username':auth.username} )
@@ -55,6 +70,7 @@ def login() :
                 token = jwt.encode( \
                     {'user' : auth.username,
                      'admin' : user["admin"],
+                     'userID' : user["_id"],
                      'exp' : datetime.datetime.utcnow() + \
                              datetime.timedelta(minutes=30)
                         }, app.config['SECRET_KEY'])
@@ -103,7 +119,7 @@ def signup() :
         return make_response(jsonify({"error":"Missing form data"}),404)
     
 #Editing user !!CANNOT CHANGE PASSWORD OR ADMIN STATUS IMPLEMENT SEPERATE FUNCTION WITH SECURITY MEASURES
-@app.route("/api/v1.0/user/<string:id>", methods=["PUT"])
+@app.route("/api/v1.0/users/<string:id>", methods=["PUT"])
 def edit_user(id):
 
     #Ensuring no missing form fields
@@ -132,7 +148,7 @@ def edit_user(id):
         return make_response(jsonify({"error":"Missing form data"}),404)
 
 #Deleting user
-@app.route("/api/v1.0/user/<string:id>", methods=["DELETE"])
+@app.route("/api/v1.0/users/<string:id>", methods=["DELETE"])
 def delete_user(id):
    
     user = userDB.UserCollection.find_one({"_id": ObjectId(id)})
@@ -143,7 +159,7 @@ def delete_user(id):
 
 
 #Get all users
-@app.route("/api/v1.0/user", methods=["GET"])
+@app.route("/api/v1.0/users", methods=["GET"])
 def get_users():
     users = []
     # Loop through each collection and retrieve all animals
@@ -157,7 +173,7 @@ def get_users():
     return make_response(jsonify(users),200)
 
 #Get Specific user
-@app.route("/api/v1.0/user/<string:id>")
+@app.route("/api/v1.0/users/<string:id>")
 def get_user(id):
     # Loop through  collection and find the user with the specified ID
     user = userDB.UserCollection.find_one({"_id": ObjectId(id)})
@@ -171,26 +187,13 @@ def get_user(id):
     return make_response( jsonify({"error" : "Invalid user ID"}), 404)
 
 
-@app.route("/api/v1.0/user/logout", methods=['GET'])
+@app.route("/api/v1.0/user/signout", methods=['GET'])
 @jwt_required
 def logout():
     token = request.headers['x-access-token']
     blacklist.insert_one({"token":token})
     
     return make_response( jsonify( { 'message' : 'Logout successful'}), 200)
-
-def admin_required(func):
-    @wraps(func)
-    def admin_required_wrapper(*args, **kwargs):
-        token = request.headers['x-access-token']
-        data = jwt.decode(token, app.config['SECRET_KEY'])
-
-        if data["admin"]:
-            return func(*args, *kwargs)
-        else:
-            return make_response(jsonify( { "message" : "Admin access required"}), 401)
-    return admin_required_wrapper
-
 
 
 # Define API endpoint
@@ -286,6 +289,7 @@ def show_all_animals():
 
 #Uploading animal   
 @app.route("/api/v1.0/animal", methods=["POST"])
+@jwt_required
 def add_animal():
     #Ensuring no missing form fields
     if "Species" in request.form and \
@@ -293,6 +297,12 @@ def add_animal():
         "LifeStage" in request.form and \
         "Location" in request.form and \
         "image" in request.form:
+
+        #Getting userID from jwt token
+        token = request.headers['x-access-token']
+        data = jwt.decode(token, app.config['SECRET_KEY'])
+        userID = data["userID"]
+
         #Creating new animal document
         new_animal = { "Species" : request.form["Species"],
         "Gender" : request.form["Gender"],
@@ -300,7 +310,8 @@ def add_animal():
         "Location" : request.form["Location"],
         "image" : request.form["image"],
         "Rating" : [],
-        "Comments" : []
+        "Comments" : [],
+        "userID" : userID
         }
 
         #Grabbing Species field to identify which animal collection should be added to
@@ -317,6 +328,7 @@ def add_animal():
 
 #Editing animal
 @app.route("/api/v1.0/animal/<string:id>", methods=["PUT"])
+@jwt_required
 def edit_animals(id):
 
     #Ensuring no missing form fields
@@ -351,6 +363,7 @@ def edit_animals(id):
 
 #Deleting animal
 @app.route("/api/v1.0/animal/<string:id>", methods=["DELETE"])
+@jwt_required
 def delete_animal(id):
     #Goes through each collection to find a animal which has matching ID,
     #Could be less efficient than using an endpoint with a variable for Species
