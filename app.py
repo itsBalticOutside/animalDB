@@ -102,7 +102,8 @@ def signup() :
         "email" : request.form["email"],
         "admin" : request.form["admin"],
         "password" : request.form["password"],
-        "Comments" : []
+        "Comments" : [],
+        "uploadIDs" : []
         }
 
         #inserting user to mongodb user collection
@@ -111,7 +112,7 @@ def signup() :
         
         new_user_id = userDB.UserCollection.insert_one(new_user)
         #Creating link to user entry so can access quickly
-        new_user_link = "http://localhost:5000/api/v1.0/user/" + str(new_user_id.inserted_id)
+        new_user_link = "http://localhost:5000/api/v1.0/users/" + str(new_user_id.inserted_id)
         return make_response(jsonify({"url": new_user_link}), 201)
 
     else:
@@ -140,7 +141,7 @@ def edit_user(id):
             } )
         if result.matched_count == 1:
             edited_user_link = \
-                "http://localhost:5000/api/v1.0/user/" + id
+                "http://localhost:5000/api/v1.0/users/" + id
             return make_response(jsonify({ "url":edited_user_link}),200)
         else:
             return make_response(jsonify({"error":"Invalid user ID"}),404)
@@ -186,6 +187,20 @@ def get_user(id):
     # If no user is found, return a 404 error response
     return make_response( jsonify({"error" : "Invalid user ID"}), 404)
 
+#Get user uploads
+@app.route("/api/v1.0/users/<string:id>/uploads")
+def get_userUploads(id):
+    # Loop through  collection and find the user with the specified ID
+    user = userCollection.find_one({"_id": ObjectId(id)})
+    if user is not None:
+        uploads = user["uploadIDs"]
+        
+            
+        # Return the user as a JSON response
+        return make_response( jsonify( uploads ), 200)
+    # If no user is found, return a 404 error response
+    return make_response( jsonify({"error" : "Invalid user ID"}), 404)
+
 
 @app.route("/api/v1.0/user/signout", methods=['GET'])
 @jwt_required
@@ -216,7 +231,8 @@ def get_animalCol(collection):
 # PLEASE REMEMBER TO UPDATE THE CODE IN HERE 
 
 #Get gender count of collection
-@app.route("/api/v1.0/animals/<string:collection>/genderCount")
+@app.route("/api/v1.0/animals/<string:collection>/query/genderCount")
+
 def get_genderCount(collection):
    
     pipeline = [    {"$group": {"_id": "$Gender", "genderCount": {"$sum": 1}}}]
@@ -224,6 +240,29 @@ def get_genderCount(collection):
     genderCount = list(animalDB[collection.title()].aggregate(pipeline))
 
     return make_response(jsonify(genderCount),200)
+
+#Get animals of specific gender and collection
+@app.route("/api/v1.0/animals/<string:collection>/query/gender/<string:genderType>")
+
+def get_genderCollection(collection,genderType):
+    animals = list(animalDB[collection.title()].find({"Gender": genderType.title()}))
+    for animal in animals:
+        animal["_id"] = str(animal["_id"])
+    return make_response(jsonify(animals),200)
+
+#Get animals of specific gendder all collections
+@app.route("/api/v1.0/animals/query/gender/<string:genderType>")
+def get_gender(genderType):
+    animals = []
+    for collection in animalDB.list_collection_names():
+        animals += list(animalDB[collection.title()].find({"Gender": genderType.title()}))
+    # Convert ObjectId fields to strings
+    for animal in animals:
+        animal["_id"] = str(animal["_id"])
+   
+    return make_response(jsonify(animals),200)
+
+
 
 #Get collection names
 @app.route("/api/v1.0/collections")
@@ -234,7 +273,7 @@ def get_Col():
     return make_response(jsonify(collection_names),200)
 
 #Get all animals
-@app.route("/api/v1.0/animals", methods=["GET"])
+@app.route("/api/v1.0/animals/", methods=["GET"])
 def get_animals():
     animals = []
     # Loop through each collection and retrieve all animals
@@ -252,16 +291,16 @@ def get_animals():
 
 
 #Get Specific animal
-@app.route("/api/v1.0/animal/<string:id>")
-def get_animal(id):
-    # Loop through each collection and try to find the animal with the specified ID
-    for collection in animalDB.list_collection_names():
-        animal = animalDB[collection].find_one({"_id": ObjectId(id)})
-        if animal is not None:
-            # Convert ObjectId field to string
-            animal["_id"] = str(animal["_id"])
-            # Return the animal as a JSON response
-            return make_response( jsonify( [animal] ), 200)
+@app.route("/api/v1.0/animals/<string:collection>/<string:id>")
+def get_animal(collection,id):
+    
+    #find the animal with the specified ID
+    animal = animalDB[collection.title()].find_one({"_id": ObjectId(id)})
+    if animal is not None:
+        # Convert ObjectId field to string
+        animal["_id"] = str(animal["_id"])
+        # Return the animal as a JSON response
+        return make_response( jsonify( [animal] ), 200)
     # If no animal is found, return a 404 error response
     return make_response( jsonify({"error" : "Invalid animal ID"}), 404)
 
@@ -318,8 +357,10 @@ def add_animal():
         collection = request.form["Species"] 
         #inserting animal to mongodb collection
         new_animal_id = animalDB[collection.title()].insert_one(new_animal)
+        #Adding uploadID to user profile
+        userCollection.update_one({"_id": ObjectId(userID)}, {'$push': {'uploadIDs' : str(new_animal_id.inserted_id)}})
         #Creating link to animals entry so can access quickly
-        new_animal_link = "http://localhost:5000/api/v1.0/animal/" + str(new_animal_id.inserted_id)
+        new_animal_link = "http://localhost:5000/api/v1.0/animals/" + str(new_animal_id.inserted_id)
         return make_response(jsonify({"url": new_animal_link}), 201)
 
     else:
