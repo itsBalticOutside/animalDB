@@ -14,9 +14,7 @@ export class BarComponent {
   private margin = 50;
   private width = 300 - (this.margin * 2);
   private height = 300 - (this.margin * 2);
-  collection_name: any = [];
   url: any;
-  animal: any;
   animal_Data: any;
 
   constructor(private route: ActivatedRoute, private webService: WebService) { }
@@ -65,16 +63,16 @@ export class BarComponent {
     .attr("height", (d: any) => this.height - y(d.genderCount))
     .attr("fill", "#d04a35");
   }
-
-
+ 
   ngOnInit(): void {
 
-    // Getting Species
-    this.webService.getAnimal(this.route.snapshot.params['id']).subscribe(data => {
+    // Getting gender data
+    //Getting species name to create endpoint URL
+    this.webService.getAnimal(this.route.snapshot.params['Species'],this.route.snapshot.params['id']).subscribe(data => {
       this.animal_Data = data
       //Creating url to retreive genderCount
       this.url = 'http://localhost:5000/api/v1.0/animals/' + this.animal_Data[0]['Species'] 
-        + '/genderCount' 
+        + '/query/genderCount' 
 
       //Assinging data and plotting graph, Done inside subscribe{} 
       // so server has time to retieve data

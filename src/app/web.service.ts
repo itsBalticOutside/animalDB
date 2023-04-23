@@ -11,12 +11,13 @@ export class WebService {
     
     //Getting Animal/Animalss
     getAnimals() {
-        return this.http.get('http://localhost:5000/api/v1.0/animals');
+        return this.http.get('http://localhost:5000/api/v1.0/animals/');
         }
 
-    getAnimal(id: any) {
+    getAnimal(collection:any ,id: any) {
         this.animalID = id;
-        const url = 'http://localhost:5000/api/v1.0/animal/' + id;
+
+        const url = 'http://localhost:5000/api/v1.0/animals/' + collection+"/"+id;
         
         let headers = new HttpHeaders();
         let token = localStorage.getItem('token');
@@ -33,6 +34,13 @@ export class WebService {
     }
     getCollections() {
         return this.http.get('http://localhost:5000/api/v1.0/collections');
+    }
+
+    getCollectionOfGender(collection:any,genderType:any) {
+        return this.http.get('http://localhost:5000/api/v1.0/animals/' + collection + '/query/gender/' + genderType);
+    }
+    getAllGender(genderType:any) {
+        return this.http.get('http://localhost:5000/api/v1.0/animals/query/gender/' + genderType);
     }
 
     //Posting Animal
@@ -74,7 +82,7 @@ export class WebService {
     }
 
     //Log user in
-    login(user:any){
+    signin(user:any){
         const headers = new HttpHeaders({ Authorization: 'Basic ' + btoa(user.username + ':' + user.password) });
         const url = 'http://localhost:5000/api/v1.0/user/signin';
         

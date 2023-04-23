@@ -23,6 +23,7 @@ export class UploadAnimalComponent {
   collection_name: any = [];
   uploadForm: any;
 
+
   constructor(private http: HttpClient,
               private formBuilder: FormBuilder,
               private webService: WebService) { }
@@ -34,7 +35,7 @@ export class UploadAnimalComponent {
       Gender: ['', Validators.required],
       LifeStage: ['', Validators.required],
       Location: ['', Validators.required],
-      image: ['', Validators.required]
+      image: ['', Validators.required],
     });
 
     this.collection_name = this.webService.getCollections();
@@ -43,7 +44,7 @@ export class UploadAnimalComponent {
   //submit review button
   onSubmit(){
      if (this.uploadForm.valid){
-      this.webService.postReview(this.uploadForm.value).subscribe((response:any) =>{});
+      this.webService.postAnimal(this.uploadForm.value).subscribe((response:any) =>{});
       this.uploadForm.reset();
      }
     

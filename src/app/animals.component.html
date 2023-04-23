@@ -12,12 +12,29 @@
     </div>
 </div> 
 
+  <div>
+    <form [formGroup]="filterForm" (ngSubmit)="onFilter()">
+    <label for="Species">Species</label>
+
+    <select id="Species" Species="Species" [(ngModel)]="selectedSpecies " formControlName="Species" >
+      <option value="">All Species</option>
+      <option *ngFor = "let Species of collectionName | async" [value]="Species">{{ Species }}</option>
+    </select>
+    <select id="Gender" Species="Gender" [(ngModel)]="selectedGender " formControlName="Gender" >
+        <option value="">All Genders</option>
+        <option value="Male">Male</option>
+        <option value="Female">Female</option>
+        
+      </select>
+    <button>Filter</button>
+</form>
+</div>
 <!--Aniamls card Group-->
 <div class ="container">
     <div class="row">
         <div class="card-group">
             <div  class="col-sm-3" *ngFor = "let animal of animal_list | async">
-                <div class="card text-white bg-black mb-3" style ="cursor: pointer" [routerLink]="['/animal', animal._id]">
+                <div class="card text-white bg-black mb-3" style ="cursor: pointer" [routerLink]="['/animals/',animal.Species, animal._id]">
                     <img [src] = [animal.image] class="card-img-top" height="200">
                     <div class="card-header">
                        Species: {{animal.Species}}
@@ -42,4 +59,5 @@
     <div class="col-sm-6 text-end">
         <button class="btn btn-primary"(click)="nextPage()">Next</button>
     </div>
+    
 </div> 

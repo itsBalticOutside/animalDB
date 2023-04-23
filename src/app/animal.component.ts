@@ -33,7 +33,7 @@ export class AnimalComponent {
         //Getting animal
        // this.animal_list = this.webService.getAnimal(this.route.snapshot.params['id']);
 
-        this.webService.getAnimal(this.route.snapshot.params['id']).subscribe(data => {
+        this.webService.getAnimal(this.route.snapshot.params['Species'],this.route.snapshot.params['id']).subscribe(data => {
             this.animalData = data;
             this.animalData = this.animalData
             this.uploaderID = this.animalData[0].userID;
