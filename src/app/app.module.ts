@@ -15,6 +15,7 @@ import { AuthModule } from '@auth0/auth0-angular';
 import { NavComponent } from './nav.component';
 import { UploadAnimalComponent } from './upload-animal.component';
 import { BarComponent } from './bar.component';
+import { UserProfileComponent } from './user-profile.component';
 
 
 
@@ -28,12 +29,16 @@ var routes: any = [
     component: AnimalsComponent
   },
   {
-    path: 'animal/:id',
+    path: 'animals/:Species/:id',
     component: AnimalComponent
   },
   {
     path: 'upload',
     component: UploadAnimalComponent
+  },
+  {
+    path: 'user/:id',
+    component: UserProfileComponent
   }
 ];
 
@@ -43,7 +48,8 @@ var routes: any = [
     HomeComponent, AnimalComponent,
     NavComponent,
     UploadAnimalComponent,
-    BarComponent
+    BarComponent,
+    UserProfileComponent
   ],
   imports: [
     BrowserModule, HttpClientModule,
@@ -51,7 +57,10 @@ var routes: any = [
     ReactiveFormsModule,
     AuthModule.forRoot( {
       domain: 'dev-oxleyyqtr12nl3u7.uk.auth0.com',
-      clientId: '9x4DIuHagUIf3zo9t5w3a47zH5kxEmOu'
+      clientId: '9x4DIuHagUIf3zo9t5w3a47zH5kxEmOu',
+      authorizationParams: {
+        redirect_uri: window.location.origin
+      }
     })
   ],
   providers: [WebService],

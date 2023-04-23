@@ -44,12 +44,11 @@ export class HomeComponent {
      //submit review button
      onSubmitLogin(){
        const loginData = this.loginForm.value;
-       this.webService.login(loginData)
+       this.webService.signin(loginData)
+
      }
 
      onSubmitSignup(){
-
-      
   
       if (this.signupForm.valid){
         this.webService.signup(this.signupForm.value);
