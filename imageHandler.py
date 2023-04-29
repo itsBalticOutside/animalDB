@@ -6,6 +6,34 @@ import json
 from flask import Flask, jsonify, make_response, request
 
 class imageUpload:
+    def getPredictionURL(imageURL):
+
+        # Setting computer vison variables
+        ENDPOINT = " Azure computer vision prediction endpoint"
+        prediction_key = " Prediction key"
+        prediction_resource_id = " Computer vision prediction subscription id"
+        prediction_credentials = ApiKeyCredentials(in_headers={"Prediction-key": prediction_key})
+        predictor = CustomVisionPredictionClient(ENDPOINT, prediction_credentials)
+        project_id = ' Computer Vision project ID '
+        publish_iteration_name= 'Iteration1'
+
+        animals = []
+
+        
+         # Make prediction
+        results = predictor.classify_image_url(project_id, publish_iteration_name, imageURL)
+       
+
+            # Display the results.
+        for prediction in results.predictions:
+            animals.append(prediction.tag_name)
+            print("\t" + prediction.tag_name +
+                ": {0:.2f}%".format(prediction.probability * 100))
+
+        
+        print("This animal is most likely " + animals[0])
+        return animals[0]
+    
     def getPrediction(image_path):
 
         # Setting computer vison variables

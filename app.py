@@ -374,21 +374,20 @@ def add_animal():
         userID = data["userID"]
 
         #Getting image path from form
-        image_path = request.form["image"]
+        imageURL = request.form["image"]
 
         #Uploading image to animal classification model to get a prediction on species
-        animalPrediction = imageUpload.getPrediction(image_path)
+        animalPrediction = imageUpload.getPredictionURL(imageURL)
 
         if animalPrediction is not None:
             #Uploading image to blob storage which returns the new url to be used to display image
-            blob_url = imageUpload.blobUpload(image_path)
-
+            
             #Creating new animal document
             new_animal = { "Species" : animalPrediction,
             "Gender" : request.form["Gender"],
             "LifeStage" : request.form["LifeStage"],
             "Location" : request.form["Location"],
-            "image" : blob_url,
+            "image" : request.form["image"],
             "Rating" : [],
             "Comments" : [],
             "userID" : userID

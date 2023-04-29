@@ -1,5 +1,6 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable} from '@angular/core';
+import { image } from 'd3';
 import { Observable } from 'rxjs';
 
 @Injectable()
@@ -137,6 +138,17 @@ export default class WebService {
    getUserUploads(userID: string){
     const url = 'http://localhost:5000/api/v1.0/users/' + userID + '/uploads'
     return this.http.get(url,{})
+   }
+
+   imageUpload(file:any){
+     const blobEndpoint = 'https://prod-02.westeurope.logic.azure.com:443/workflows/3c15f39ae3784b6297157792cb295866/triggers/manual/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=7_gZH3qIiBRGMTFl-c0vFlbEnNsAqKXYcnVycsqaCZg'
+     var imageForm = new FormData()
+     
+     imageForm.append("image", file)
+     console.log("bob")
+      
+    return this.http.post(blobEndpoint, imageForm)
+     
    }
       
 }
