@@ -1,14 +1,15 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable} from '@angular/core';
+import { Observable } from 'rxjs';
 
 @Injectable()
-export class WebService {
+export default class WebService {
 
     animal_list: any;
     private animalID: any;
     token: any;
     constructor(public http: HttpClient) {}
-    
+    private userID:any;
     //Getting Animal/Animalss
     getAnimals() {
         return this.http.get('http://localhost:5000/api/v1.0/animals/');
@@ -16,17 +17,14 @@ export class WebService {
 
     getAnimal(collection:any ,id: any) {
         this.animalID = id;
-
         const url = 'http://localhost:5000/api/v1.0/animals/' + collection+"/"+id;
-        
-        let headers = new HttpHeaders();
-        let token = localStorage.getItem('token');
+        return this.http.get(url , {});
+    }
 
-        if (token) {
-        headers = headers.set('x-access-token', token);
-        }
-
-        return this.http.get(url , {headers});
+    getAnimalUserProfile(id: any) {
+        this.animalID = id;
+        const url = 'http://localhost:5000/api/v1.0/animal/' + id;
+        return this.http.get(url , {});
     }
 
     getCollection(collection:any) {
@@ -45,12 +43,13 @@ export class WebService {
 
     //Posting Animal
     postAnimal(animal:any){
+        //Gets jwt token from header for token auth
         let headers = new HttpHeaders();
         let token = localStorage.getItem('token');
-
         if (token) {
         headers = headers.set('x-access-token', token);
         }
+        //Posts form data to backend
         let postData = new FormData();
         postData.append("Species", animal.Species);
         postData.append("Gender", animal.Gender);
@@ -62,9 +61,9 @@ export class WebService {
     
     //Delete Animal
     delAnimal(id:any){
+        //Gets jwt token from header for token auth
         let headers = new HttpHeaders();
         let token = localStorage.getItem('token');
-
         if (token) {
         headers = headers.set('x-access-token', token);
         }
@@ -83,15 +82,15 @@ export class WebService {
 
     //Log user in
     signin(user:any){
+        //Adds username and password to auth headers
         const headers = new HttpHeaders({ Authorization: 'Basic ' + btoa(user.username + ':' + user.password) });
         const url = 'http://localhost:5000/api/v1.0/user/signin';
         
         this.http.post(url, {}, { headers }).subscribe(
             (response) => {
-              console.log(response);
+              //Adds jwt token to local storage
               this.token = response;
               localStorage.setItem('token', this.token['token'])
-              
             },
             (error) => {
               console.log(error);
@@ -120,12 +119,24 @@ export class WebService {
             }
           );
     }
-
+    
+    //Get user details using userID
     getUser(userID:any){
         const url = 'http://localhost:5000/api/v1.0/users/' + userID;
         return this.http.get(url)
     }
+    
+    //Gets userID from decoding token in backend
+    getUserID(token: string | string[]){ 
+        let headers = new HttpHeaders();
+        headers = headers.set('x-access-token', token);
+        return this.http.post('http://localhost:5000/api/v1.0/user/id',{}, { headers })
+    }
 
-   
+    //Uses userID to retrieve user uplaods !!Not in use!!
+   getUserUploads(userID: string){
+    const url = 'http://localhost:5000/api/v1.0/users/' + userID + '/uploads'
+    return this.http.get(url,{})
+   }
       
 }

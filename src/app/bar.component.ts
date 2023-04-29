@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import * as d3 from 'd3';
-import { WebService } from "./web.service";
+import WebService from "./web.service";
 import { ActivatedRoute } from '@angular/router';
 
 @Component({

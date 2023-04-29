@@ -1,5 +1,5 @@
 import { Component } from "@angular/core";
-import { WebService } from "./web.service";
+import WebService from "./web.service";
 import { ActivatedRoute } from '@angular/router';
 import { FormBuilder, Validators } from '@angular/forms';
 import { AuthService } from '@auth0/auth0-angular';
@@ -23,10 +23,6 @@ export class AnimalComponent {
     animalData:any;
     uploaderID: any;
         
-
-
-
-
 
     ngOnInit(){
         

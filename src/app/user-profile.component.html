@@ -1,1 +1,31 @@
+<br>
+<br>
+<br>
+
 <p>user-profile works!</p>
+<h1>Uploader Username: <strong>{{userInfo.username}}</strong></h1>
+<h1>Uploader ID: <strong>{{userID}}</strong></h1>
+
+<div class ="container">
+    <div class="row">
+        <div class="card-group">
+            <div  class="col-sm-3" *ngFor = "let animal of animals">
+                <div class="card text-white bg-black mb-3" style ="cursor: pointer" [routerLink]="['/animals/',animal.Species, animal._id]">
+                    <img [src] = [animal.image] class="card-img-top" height="200">
+                    <div class="card-header">
+                       Species: {{animal.Species}}
+                    </div>
+                    <div class="card-body">
+                        Gender: {{animal.Gender}}
+                        <br>
+                        Location: {{animal.Location}}
+                    </div>
+
+                </div>
+                
+            </div>
+        </div>
+        
+    </div>
+
+</div>

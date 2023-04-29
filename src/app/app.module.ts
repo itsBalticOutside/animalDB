@@ -3,7 +3,7 @@ import { BrowserModule } from '@angular/platform-browser';
 
 import { AppComponent } from './app.component';
 import { AnimalsComponent } from './animals.component';
-import { WebService } from './web.service';
+import WebService from './web.service';
 import { HttpClientModule } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
 
@@ -37,7 +37,7 @@ var routes: any = [
     component: UploadAnimalComponent
   },
   {
-    path: 'user/:id',
+    path: 'user',
     component: UserProfileComponent
   }
 ];

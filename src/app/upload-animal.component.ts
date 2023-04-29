@@ -1,7 +1,7 @@
 import { Component, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { FormBuilder, Validators } from '@angular/forms';
-import { WebService } from "./web.service";
+import WebService from "./web.service";
 
 
 @Component({
@@ -15,7 +15,7 @@ export class UploadAnimalComponent {
   Gender: any;
   LifeStage: any;
   Location: any;
-  Image: any;
+  image: File | undefined;
   Comments: any;
   Rating: any
 
@@ -23,25 +23,22 @@ export class UploadAnimalComponent {
   collection_name: any = [];
   uploadForm: any;
 
-
   constructor(private http: HttpClient,
               private formBuilder: FormBuilder,
               private webService: WebService) { }
 
   ngOnInit(){
-     //Building review and edit forms
+     //Building upload forms
     this.uploadForm = this.formBuilder.group({
-      Species: ['', Validators.required],
+      Species: ['',],
       Gender: ['', Validators.required],
       LifeStage: ['', Validators.required],
       Location: ['', Validators.required],
       image: ['', Validators.required],
     });
-
-    this.collection_name = this.webService.getCollections();
   }
 
-  //submit review button
+  //Post animal details to database
   onSubmit(){
      if (this.uploadForm.valid){
       this.webService.postAnimal(this.uploadForm.value).subscribe((response:any) =>{});

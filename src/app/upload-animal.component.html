@@ -8,14 +8,13 @@
                 <!--Upload Form-->
                 <h2>Enter upload details</h2>
                 <form [formGroup]="uploadForm" (ngSubmit)="onSubmit()">
-
+                    
                     <div class="form-group">
-                        <label for="Species">Species</label>
-                        <select id="Species" Species="Species" class="form-control" formControlName="Species">
-                          <option *ngFor = "let collection of collection_name | async" [value]="collection">{{ collection }}</option>
-                        </select>
+                        
+                        <label for="image">Image - Please enter full file directory (compatible filetypes png/jpg/jpeg)</label>
+                        <input type="text" id="image" image="image" [(ngModel)]="image" 
+                        class="form-control" formControlName="image">   
                     </div>
-                
                       
                     <div class="form-group">
                         <label for="Gender">Gender</label>
@@ -24,6 +23,7 @@
                           <option value="Female">Female</option>
                         </select>  
                     </div>
+
                     <div class="form-group">
                         <label for="LifeStage">LifeStage</label>
                         <select id="LifeStage" LifeStage="LifeStage" formControlName="LifeStage" class="form-control" >
@@ -39,15 +39,9 @@
                         <input type="text" id="Location" Location="Location" 
                         class="form-control" formControlName="Location">  
                     </div>
-                    <div class="form-group">
-                        <label for="image">Image</label>
-                        <input type="text" id="image" image="image" 
-                        class="form-control" formControlName="image">   
-                    </div>
                     <br>
-
                     
-                    <button  type="submit" class="btn btn-primary" [disabled]="!uploadForm.valid">Submit</button>
+                    <button  type="submit" class="btn btn-primary" [disabled]="!uploadForm.valid">Upload</button>
 
                 </form>  
             </ng-container>
