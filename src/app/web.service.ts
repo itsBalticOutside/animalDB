@@ -41,6 +41,14 @@ export default class WebService {
     getAllGender(genderType:any) {
         return this.http.get('http://localhost:5000/api/v1.0/animals/query/gender/' + genderType);
     }
+    
+    getAnimalWiki(collection: any){
+        var animalSummary
+        const url = 'http://localhost:5000/api/v1.0/animals/' + collection+ "/query/wiki";
+         
+        animalSummary = this.http.get(url , {});
+        return animalSummary
+   }
 
     //Posting Animal
     postAnimal(animal:any){
@@ -59,6 +67,17 @@ export default class WebService {
         postData.append("image", animal.image);
         return this.http.post('http://localhost:5000/api/v1.0/animal',  postData, {headers});
     }
+    //Handles uploading animal image to blob storage, returns url
+    imageUpload(file:any){
+        const blobEndpoint = 'https://prod-02.westeurope.logic.azure.com:443/workflows/3c15f39ae3784b6297157792cb295866/triggers/manual/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=7_gZH3qIiBRGMTFl-c0vFlbEnNsAqKXYcnVycsqaCZg'
+        var imageForm = new FormData()
+        
+        imageForm.append("image", file)
+        console.log("bob")
+         
+       return this.http.post(blobEndpoint, imageForm)
+        
+      }
     
     //Delete Animal
     delAnimal(id:any){
@@ -80,6 +99,9 @@ export default class WebService {
         putData.append("Location",animal.Location);
         return this.http.put('http://localhost:5000/api/v1.0/animal/' + this.animalID, putData);
     }
+
+    //!! ^ Animal methdods ^ !!
+    //!! v User methdods v !!
 
     //Log user in
     signin(user:any){
@@ -140,15 +162,16 @@ export default class WebService {
     return this.http.get(url,{})
    }
 
-   imageUpload(file:any){
-     const blobEndpoint = 'https://prod-02.westeurope.logic.azure.com:443/workflows/3c15f39ae3784b6297157792cb295866/triggers/manual/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=7_gZH3qIiBRGMTFl-c0vFlbEnNsAqKXYcnVycsqaCZg'
-     var imageForm = new FormData()
-     
-     imageForm.append("image", file)
-     console.log("bob")
-      
-    return this.http.post(blobEndpoint, imageForm)
-     
+   editUser(userID:any, userInfo:any){
+    let putData = new FormData();
+    putData.append("Forename",userInfo.Forename);
+    putData.append("Surname",userInfo.Surname);
+    putData.append("Email",userInfo.Email);
+    putData.append("Username",userInfo.Username);
+    
+    return this.http.put('http://localhost:5000/api/v1.0/users/edit/' + userID, putData);
    }
+
+
       
 }

@@ -9,7 +9,7 @@ import datetime
 from functools import wraps
 import uuid, random
 from imageHandler import imageUpload
-
+import wikipedia
 app = Flask(__name__)
 CORS(app)
 
@@ -462,6 +462,22 @@ def delete_animal(id):
             animalDB[collection].delete_one({"_id": ObjectId(id)})
             return jsonify({"message": "Animal deleted."}), 200
     return jsonify({"message": "Animal not found."}), 404
+
+@app.route("/api/v1.0/animals/<string:species>/query/wiki")
+
+def get_collectionWikiInfo(species):
+
+    # set language if not english
+    wikipedia.set_lang("en")
+    # get the wikipedia page for aniaml
+    species = species+" (animal)"
+    page = wikipedia.page(species)
+    
+    # print the summary of the page
+    animalSummary = page.summary
+    content = page.content
+    return jsonify({"summary": animalSummary, "content" : content}), 200
+
 
 
 if __name__ == "__main__" :

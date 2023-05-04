@@ -22,7 +22,7 @@ export class AnimalComponent {
     uploaderInfo: any;
     animalData:any;
     uploaderID: any;
-        
+    animalSummary: any; 
 
     ngOnInit(){
         
@@ -33,14 +33,24 @@ export class AnimalComponent {
             this.animalData = data;
             this.animalData = this.animalData
             this.uploaderID = this.animalData[0].userID;
+            
             console.log(this.animalData)
             this.webService.getUser(this.uploaderID).subscribe(data => {
                 this.uploaderInfo = data;
                 this.uploaderInfo = this.uploaderInfo[0]
                 console.log(this.uploaderInfo)
             });
-          });
-
+        });
+        
+        this.webService.getAnimalWiki(this.route.snapshot.params['Species']).subscribe(
+            (data: any) => {
+              this.animalSummary = data;
+              console.log(this.animalSummary);
+            },
+            (error: any) => {
+              console.error(error);
+            }
+          );
         
     }
     
@@ -51,4 +61,26 @@ export class AnimalComponent {
         });
         this.animal_list = this.webService.getAnimals();
     }
+
+
+    async exampleAsyncFunction() {
+        try {
+          var result = await this.webService.getAnimalWiki(this.route.snapshot.params['Species']);
+          this.animalSummary = result
+          this.animalSummary = this.animalSummary.summary
+          console.log(this.animalSummary);
+        } catch (error) {
+          console.error(error);
+        }
+      }
+      
+       longRunningFunction() {
+        return new Promise((resolve, reject) => {
+          setTimeout(() => {
+            resolve('Done!');
+          }, 3000);
+        });
+      }
+      
+      
 }
