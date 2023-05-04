@@ -1,0 +1,38 @@
+.auth-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .auth-tabs {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 2rem;
+  }
+  
+  .auth-tabs button {
+    border: none;
+    background-color: transparent;
+    font-size: 1.5rem;
+    margin-right: 1rem;
+    padding: 0.5rem 1rem;
+    color: #555;
+    cursor: pointer;
+    outline: none;
+  }
+  
+  .auth-tabs button.active {
+    color: #000;
+    border-bottom: 3px solid #000;
+  }
+  
+  .auth-form-container {
+    width: 100%;
+    max-width: 600px;
+    padding: 2rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  }
+  
