@@ -1,31 +1,61 @@
-<br>
-<br>
-<br>
-
-<p>user-profile works!</p>
-<h1>Uploader Username: <strong>{{userInfo.username}}</strong></h1>
-<h1>Uploader ID: <strong>{{userID}}</strong></h1>
-
-<div class ="container">
+<div class="container" style="margin-top: 70px;">
     <div class="row">
-        <div class="card-group">
-            <div  class="col-sm-3" *ngFor = "let animal of animals">
-                <div class="card text-white bg-black mb-3" style ="cursor: pointer" [routerLink]="['/animals/',animal.Species, animal._id]">
-                    <img [src] = [animal.image] class="card-img-top" height="200">
-                    <div class="card-header">
-                       Species: {{animal.Species}}
-                    </div>
-                    <div class="card-body">
-                        Gender: {{animal.Gender}}
-                        <br>
-                        Location: {{animal.Location}}
-                    </div>
-
-                </div>
-                
-            </div>
-        </div>
-        
+      <div class="col-sm-12">
+        <h1>User Profile</h1>
+        <hr>
+      </div>
     </div>
-
-</div>
+    <div class="row">
+      <div class="col-sm-4">
+        <div class="card" style="margin-bottom: 20px;">
+          <div class="card-body">
+            <h5 class="card-title">User Info</h5>
+            <hr>
+            <p class="card-text">Forename: <strong>{{userInfo.forename}}</strong></p>
+            <p class="card-text">Surname: <strong>{{userInfo.surname}}</strong></p>
+            <p class="card-text">Email: <strong>{{userInfo.email}}</strong></p>
+            <hr>
+            <p class="card-text">Uploader ID: <strong>{{userID}}</strong></p>
+            <p class="card-text">Uploader Username: <strong>{{userInfo.username}}</strong></p>
+          </div>
+          <button class= "btn btn-primary" (click)="onEditForm()" >Edit</button>
+          <div id="editForm" style="display:none">
+            <form [formGroup]="editForm" (ngSubmit)="onEdit()">
+              <label> Forename: </label>
+              <input formControlName="Forename">
+            <br>
+              <label> Surname: </label>
+              <input formControlName="Surname">
+              <br>
+              <label> Email: </label>
+              <input formControlName="Email">
+              <br>       
+              <label> Username: </label>
+              <input formControlName="Username">
+              <br>
+              <button type="submit">Update</button>
+            </form>
+          </div>
+          
+        </div>
+      </div>
+      <div class="col-sm-8">
+        <div class="card-group">
+          <div class="col-sm-4" *ngFor="let animal of animals">
+            <div class="card mb-3" style="cursor: pointer;" [routerLink]="['/animals/', animal.Species, animal._id]">
+              <img [src]="animal.image" class="card-img-top" height="200">
+              <div class="card-header">
+                Species: {{animal.Species}}
+              </div>
+              <div class="card-body">
+                Gender: {{animal.Gender}}
+                <br>
+                Location: {{animal.Location}}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
