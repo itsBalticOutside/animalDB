@@ -1,8 +1,9 @@
 import { Component } from "@angular/core";
-import { AuthService } from "@auth0/auth0-angular";
+import { AuthComponent } from "./auth.component";
 import WebService from "./web.service";
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { timeout } from "d3";
 
 
 @Component({
@@ -12,9 +13,12 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 })
 export class LoginComponent {
   loginForm: any;
- 
-    
-    constructor(public authService: AuthService,public http: HttpClient,
+  showMessage = false;
+  message = '';
+  loading = false; 
+
+
+    constructor(public authComponent: AuthComponent,public http: HttpClient,
                 public webService: WebService, private formBuilder: FormBuilder) {}
 
             
@@ -24,16 +28,34 @@ export class LoginComponent {
          username: ['', Validators.required],
          password: ['', Validators.required],
        });
-
+       this.webService.signInSuccessEvent.subscribe((event: string) => {
+        this.showMessage = true;
+        this.message = 'You have successfully signed in!';
+      });
      }
    
 
 
      //Login button 
-     onSubmitLogin(){
-       const loginData = this.loginForm.value;
-       this.webService.signin(loginData)
-       this.loginForm.reset();
-       alert("Welcome back, " + loginData.username + "!");
-     }
+    onSubmitLogin(){
+      this.loading = true;
+      const loginData = this.loginForm.value;
+      this.webService.signin(loginData)
+      setTimeout(() => {
+        if (this.showMessage) {
+          this.loginForm.reset();
+          this.loading = false;
+          alert("Welcome back, " + loginData.username + "!");
+        } else {
+          alert("Login failed, please try again!");
+          this.loading = false;
+        }
+      },1000);
+     
+  }
+
+
+
+
+  
 }

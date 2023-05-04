@@ -37,11 +37,13 @@ var routes: any = [
   },
   {
     path: 'upload',
-    component: UploadAnimalComponent
+    component: UploadAnimalComponent,
+    canActivate: [AuthComponent]
   },
   {
     path: 'user',
-    component: UserProfileComponent
+    component: UserProfileComponent,
+    canActivate: [AuthComponent]
   }
 ];
 

@@ -19,7 +19,9 @@
         <br>
 
         
-        <button  type="submit" class="btn btn-primary" [disabled]="!loginForm.valid">Login</button>
+        <button  type="submit" class="btn btn-primary" [disabled]="!loginForm.valid" 
+        [ngClass]="{ 'loading-button': loading }">{{ loading ? 'Loading...' : 'Login' }}</button>
 
-    </form>  
+    </form>
+    <div *ngIf="showMessage">{{message}}</div>  
 </ng-container>

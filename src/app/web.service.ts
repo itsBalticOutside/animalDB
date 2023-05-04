@@ -1,7 +1,8 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Injectable} from '@angular/core';
+import { EventEmitter,Injectable} from '@angular/core';
 import { image } from 'd3';
 import { Observable } from 'rxjs';
+import {  Router } from '@angular/router';
 
 @Injectable()
 export default class WebService {
@@ -9,8 +10,9 @@ export default class WebService {
     animal_list: any;
     private animalID: any;
     token: any;
-    constructor(public http: HttpClient) {}
+    constructor(public http: HttpClient, public router : Router) {}
     private userID:any;
+    signInSuccessEvent = new EventEmitter<string>();
     //Getting Animal/Animalss
     getAnimals() {
         return this.http.get('http://localhost:5000/api/v1.0/animals/');
@@ -108,18 +110,19 @@ export default class WebService {
         //Adds username and password to auth headers
         const headers = new HttpHeaders({ Authorization: 'Basic ' + btoa(user.username + ':' + user.password) });
         const url = 'http://localhost:5000/api/v1.0/user/signin';
-        
+        var logged
         this.http.post(url, {}, { headers }).subscribe(
             (response) => {
               //Adds jwt token to local storage
               this.token = response;
               localStorage.setItem('token', this.token['token'])
+              this.signInSuccessEvent.emit('success');
             },
             (error) => {
               console.log(error);
             }
           );
-          return this.token
+        return this.token;
     }
 
     //signup user
@@ -141,6 +144,31 @@ export default class WebService {
               console.log(error);
             }
           );
+    }
+
+    logout(){
+        //Gets jwt token from header for token auth
+        let headers = new HttpHeaders();
+        let token = localStorage.getItem('token');
+        if (token) {
+            console.log("yeoo loggin out")
+            headers = headers.set('x-access-token', token);
+            return this.http.get('http://localhost:5000/api/v1.0/user/signout',{headers}).subscribe(
+            (response) => {
+              console.log(response);
+              localStorage.removeItem('token')
+              this.router.navigate(['']);
+            },
+            (error) => {
+              console.log(error);
+            }
+          )
+        } else{
+            return console.log("Log out failed")
+        }
+        
+        
+        
     }
     
     //Get user details using userID

@@ -1,8 +1,8 @@
 import { Component } from '@angular/core';
-import { AuthService } from '@auth0/auth0-angular';
+import { AuthComponent } from './auth.component';
 import { Router } from '@angular/router';
 import jwt_decode from 'jwt-decode';
-
+import WebService from "./web.service";
 
 @Component({
   selector: 'navigation',
@@ -11,7 +11,7 @@ import jwt_decode from 'jwt-decode';
 })
 
 export class NavComponent {
-    constructor(public authService: AuthService, public router: Router) {}
+    constructor(public authComponnt: AuthComponent, public router: Router, public webService: WebService) {}
 
     
     
