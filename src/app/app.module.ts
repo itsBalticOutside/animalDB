@@ -16,6 +16,9 @@ import { NavComponent } from './nav.component';
 import { UploadAnimalComponent } from './upload-animal.component';
 import { BarComponent } from './bar.component';
 import { UserProfileComponent } from './user-profile.component';
+import { AuthComponent } from './auth.component';
+import { LoginComponent } from './login.component';
+import { SignupComponent } from './signup.component';
 
 
 
@@ -49,7 +52,10 @@ var routes: any = [
     NavComponent,
     UploadAnimalComponent,
     BarComponent,
-    UserProfileComponent
+    UserProfileComponent,
+    AuthComponent,
+    LoginComponent,
+    SignupComponent
   ],
   imports: [
     BrowserModule, HttpClientModule,

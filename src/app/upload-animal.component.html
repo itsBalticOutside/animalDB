@@ -9,18 +9,21 @@
                 <h2>Enter upload details</h2>
                 <form [formGroup]="imageForm" (ngSubmit)="onImageSubmit()">
                     <div class="form-group">
-                        <label for="imageFile">Image - (compatible filetypes png/jpg/jpeg)</label>
-                        <input type="file" (change)="onFileSelected($event)" id="imageFile" image="imageFile" [(ngModel)]="imageFile" 
-                        class="form-control" formControlName="imageFile">   
+                        <label for="imageFile"><strong>Image</strong> - File size should not exceed: 4mb (compatible filetypes .png/.jpg/.bmp)</label>
+                        <input type="file" accept=".png, .jpg, .bmp" (change)="onFileSelected($event)" id="imageFile" image="imageFile" [(ngModel)]="imageFile" 
+                        class="form-control" formControlName="imageFile">  
+                        <span *ngIf="imageForm.controls['imageFile'].hasError('required')" class="error">Image is required</span>
+                        <span *ngIf="imageForm.controls['imageFile'].hasError('invalidFileSize')" class="error">Image file size must be less than 4MB</span>
+                        <span *ngIf="imageForm.controls['imageFile'].hasError('invalidFileType')" class="error">Image must be either .png, .jpg, or .bmp</span> 
                     </div>
-                    <button  type="submit" class="btn btn-primary" [disabled]="!imageForm.valid">Upload Image</button>
+                    <button  type="submit" class="btn btn-primary" [disabled]="!imageFormUploadButtonValid">Upload Image</button>
 
                 </form>
                 <form [formGroup]="uploadForm" (ngSubmit)="onSubmit()">
                     
                       
                     <div class="form-group">
-                        <label for="Gender">Gender</label>
+                        <label for="Gender"><strong>Gender</strong></label>
                         <select id="Gender" Gender="Gender" formControlName="Gender" class="form-control">
                           <option value="Male">Male</option>
                           <option value="Female">Female</option>
@@ -28,7 +31,7 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="LifeStage">LifeStage</label>
+                        <label for="LifeStage"><strong>LifeStage</strong></label>
                         <select id="LifeStage" LifeStage="LifeStage" formControlName="LifeStage" class="form-control" >
                           <option value="Infant">Infant</option>
                           <option value="Adolecent">Adolecent</option>
@@ -38,13 +41,13 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="Location">Location</label>
+                        <label for="Location"><strong>Location</strong></label>
                         <input type="text" id="Location" Location="Location" 
                         class="form-control" formControlName="Location">  
                     </div>
                     <br>
                     
-                    <button  type="submit" class="btn btn-primary" [disabled]="!uploadForm.valid">Upload</button>
+                    <button  type="submit" class="btn btn-primary" [disabled]="!uploadForm.valid">Submit</button>
 
                 </form>  
             </ng-container>

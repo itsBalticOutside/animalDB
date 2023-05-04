@@ -62,7 +62,8 @@ class imageUpload:
         
         print("This animal is most likely " + animals[0])
         return animals[0]
-
+    
+ #Now obsolete, using angular webService for image upload
     def blobUpload(image_path):
 
         blobUploadUrl = r' Blob storage logic app upload endpoint '

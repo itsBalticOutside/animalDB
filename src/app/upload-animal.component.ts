@@ -2,7 +2,7 @@ import { Component, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { FormBuilder, Validators } from '@angular/forms';
 import WebService from "./web.service";
-
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-upload-animal',
@@ -18,14 +18,19 @@ export class UploadAnimalComponent {
   Comments: any;
   Rating: any
 
+  file : any
   imageFile: File | undefined;
   imageData : any;
   imagePath: any = "";
+  imageFormUploadButtonValid: boolean = false;
+
   animal: any;
   collection_name: any = [];
+
   uploadForm: any;
   imageForm: any;
   constructor(private http: HttpClient,
+              private router: Router,
               private formBuilder: FormBuilder,
               private webService: WebService) { }
 
@@ -47,8 +52,13 @@ export class UploadAnimalComponent {
   onSubmit(){
      if (this.uploadForm.valid){
      
-        this.webService.postAnimal(this.uploadForm.value).subscribe((response:any) =>{});
-        this.uploadForm.reset();
+        this.webService.postAnimal(this.uploadForm.value).subscribe((response:any) =>{
+          this.uploadForm.reset();
+          this.imageForm.reset();
+          var animalURL = response.url
+          this.router.navigate([animalURL]);
+        });
+        
       
      }
     
@@ -67,20 +77,40 @@ export class UploadAnimalComponent {
      })
      
     }
-   
  }
+
 
  onFileSelected(event: any) {
   if (event.target.files && event.target.files.length > 0) {
-    const file = event.target.files[0];
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => {
-      this.imageData = reader.result as string;
-      console.log("imgData"+this.imageData)
-      this.imageForm.patchValue({imageFile : file});
-      console.log(this.imageForm.get("image").value)
-    };
+     this.file = event.target.files[0];
+     this.imageFormUploadButtonValid = false;
+     const maxFileSize = 4 * 1024 * 1024; // 4 MB in bytes
+     const allowedFileTypes = ["image/png", "image/jpeg", "image/bmp"];
+     if (this.file.size > maxFileSize) {
+      // handle error
+      this.imageFormUploadButtonValid = false;
+      this.imageForm.controls['imageFile'].setErrors({'invalidFileSize': true});
+      console.log("File size too large");
+      
+     } 
+     else if (!allowedFileTypes.includes(this.file.type)) {
+       // handle error
+       this.imageFormUploadButtonValid = false;
+      this.imageForm.controls['imageFile'].setErrors({'invalidFileType': true});
+      console.log("File type not allowed");
+      
+     }
+     else {
+      this.imageFormUploadButtonValid = true
+      const reader = new FileReader();
+      reader.readAsDataURL(this.file);
+      reader.onload = () => {
+        this.imageData = reader.result as string;
+        console.log("imgData"+this.imageData)
+        this.imageForm.patchValue({imageFile : this.file});
+        console.log(this.imageForm.get("image").value)
+      };
+    }
   }
 }
 

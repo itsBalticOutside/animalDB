@@ -11,9 +11,9 @@ import { ActivatedRoute } from '@angular/router';
 export class BarComponent {
 
   private svg: any;
-  private margin = 50;
-  private width = 300 - (this.margin * 2);
-  private height = 300 - (this.margin * 2);
+  private margin = 35;
+  private width = 400 - (this.margin * 2);
+  private height = 400 - (this.margin * 2);
   url: any;
   animal_Data: any;
 
