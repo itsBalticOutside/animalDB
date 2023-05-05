@@ -50,7 +50,7 @@ export class LoginComponent {
           alert("Login failed, please try again!");
           this.loading = false;
         }
-      },1000);
+      },1500);
      
   }
 

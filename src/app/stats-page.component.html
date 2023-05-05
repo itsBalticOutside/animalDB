@@ -1,0 +1,15 @@
+<br>
+<br>
+<br>
+<h2>Summary of gender diversity for each species</h2>
+<div class="row">
+    <div class="col-md-4" *ngFor="let species of speciesNames">
+      <div class="card">
+        <div><h6> {{species}} Gender Count</h6></div>
+        <div class="card-body">
+          <app-bar [Species]="species"></app-bar>
+        </div>
+      </div>
+    </div>
+  </div>
+  

@@ -19,6 +19,7 @@ import { UserProfileComponent } from './user-profile.component';
 import { AuthComponent } from './auth.component';
 import { LoginComponent } from './login.component';
 import { SignupComponent } from './signup.component';
+import { StatsPageComponent } from './stats-page.component';
 
 
 
@@ -44,6 +45,10 @@ var routes: any = [
     path: 'user',
     component: UserProfileComponent,
     canActivate: [AuthComponent]
+  },
+  {
+    path: 'stats',
+    component: StatsPageComponent
   }
 ];
 
@@ -57,7 +62,8 @@ var routes: any = [
     UserProfileComponent,
     AuthComponent,
     LoginComponent,
-    SignupComponent
+    SignupComponent,
+    StatsPageComponent
   ],
   imports: [
     BrowserModule, HttpClientModule,
