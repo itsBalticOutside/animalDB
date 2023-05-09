@@ -1,64 +1,74 @@
 
 
-<div class="container" style="margin-top:70px;">
+<!-- Animal Card-->
+<div *ngFor = "let animal of animalData">
+  <div class="container" style="margin-top: 70px;">
     <div class="row">
-        <div class="col-sm-12">
-        </div>
+      <div class="col-md-6">
+        <!-- Animal Image -->
+        <img [src]="animal.image" height="400">
+      </div>
+      <div class="col-md-6">
+        <!-- Map and related components -->
+        <app-g-maps></app-g-maps>
+        <app-g-maps-gecode [PostCode]="animal.Location"></app-g-maps-gecode>
+        <app-g-maps-heatlayer [Specie]="animal.Species"></app-g-maps-heatlayer>
+      </div>
     </div>
-</div>
+  </div>
 
-<div class ="container">
-        
-        <div class="col-sm-">
-            <!-- Animal Card-->
-            <div *ngFor = "let animal of animalData">
-                <div class="card " style ="padding: 15px; margin: auto">
-                    <div class="card-header">
-                        Species:<strong>{{animal.Species}}</strong>
-                    </div>
-                    <div class="card-body">
-                        <img [src] = [animal.image] height = "400"> <br>
-                        Gender: <strong>{{animal.Gender}}</strong><br>
-                        Life Stage: <strong>{{animal.LifeStage}}</strong><br>
-                        Locaion: <strong>{{animal.Location}}</strong><br>
-                        Upload by: <strong>{{uploaderInfo.username}}</strong><br>
-                        
-                         
-                    </div>
-
-                    <!-- Species GenderCount BarChart -->
-                    <app-bar [Species]=animal.Species></app-bar>
-
-
-
-
-                    <div class="col-md-12">
-                        <!-- Animal Wiki Information -->
-                        <div class="card">
-                          <div class="card-header">
-                            <h5 class="card-title">Learn more about {{animal.Species}} (source: wikipedia)</h5>
-                          </div>
-                          <div class="card-body">
-                            <div *ngIf="animalSummary; else loading">
-                              <p class="card-text">{{ animalSummary.summary }}</p>
-                              <a [href] = "animalSummary.url"> Additonal Information </a>
-                            </div>
-                            <ng-template #loading>
-                              <p>Loading animal wiki information...</p>
-                            </ng-template>
-                          </div>
-                        </div>
-                </div>
-                <app-g-maps></app-g-maps>
-                <app-g-maps-gecode [PostCode]="animal.Location"></app-g-maps-gecode>
-                <app-g-maps-heatlayer [Specie] = "animal.Species"></app-g-maps-heatlayer>
-              <br>
-              <!--Delete button-->
-              <button type="delete" class= "btn btn-primary" [disabled]="!deleteButtonActive" (click)="onDelete(animal._id)" [routerLink]="['/animals']">Delete</button> 
-
-            </div>
+  <div class="container">
+    <div class="row">
+      <div class="col-md-6">
+        <!-- Animal Details -->
+        <div class="card" style="padding: 15px; margin: auto;">
+          <div class="card-header">
+            Species: <strong>{{animal.Species}}</strong>
+          </div>
+          <div class="card-body">
+            Gender: <strong>{{animal.Gender}}</strong><br>
+            Life Stage: <strong>{{animal.LifeStage}}</strong><br>
+            Location: <strong>{{animal.Location}}</strong><br>
+            Uploaded by: <strong>{{uploaderInfo.username}}</strong><br>
+          </div>
         </div>
-        
+      </div>
+      <div class="col-md-6">
+        <!-- Species GenderCount BarChart -->
+        <app-bar [Species]="animal.Species"></app-bar>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12">
+        <!-- Animal Wiki Information -->
+        <div class="card">
+          <div class="card-header">
+            <h5 class="card-title">Learn more about {{animal.Species}} (source: Wikipedia)</h5>
+          </div>
+          <div class="card-body">
+            <div *ngIf="animalSummary; else loading">
+              <p class="card-text">{{ animalSummary.summary }}</p>
+              <a [href]="animalSummary.url">Additional Information</a>
+            </div>
+            <ng-template #loading>
+              <p>Loading animal wiki information...</p>
+            </ng-template>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12">
+        <!-- Delete button -->
+        <button type="delete" class="btn btn-primary" [disabled]="!deleteButtonActive" (click)="onDelete(animal._id)" [routerLink]="['/animals']">Delete</button>
+      </div>
+    </div>
+  </div>
+
 </div>
-
-
