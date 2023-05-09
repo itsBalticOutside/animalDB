@@ -5,27 +5,6 @@
   justify-content: center;
 }
 
-.login-tabs {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 2rem;
-}
-
-.login-tabs button {
-  border: none;
-  background-color: transparent;
-  font-size: 1.5rem;
-  margin-right: 1rem;
-  padding: 0.5rem 1rem;
-  color: #555;
-  cursor: pointer;
-  outline: none;
-}
-
-.login-tabs button.active {
-  color: #000;
-  border-bottom: 3px solid #000;
-}
 
 .login-form-container {
   width: 100%;

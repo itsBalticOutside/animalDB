@@ -10,7 +10,7 @@ import { Observable, of } from 'rxjs';
 export class StatsPageComponent {
     constructor(public webService: WebService){}
     speciesNames: any;
-
+    
     ngOnInit(){
 
       this.webService.getCollections().subscribe((data) => {

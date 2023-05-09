@@ -4,6 +4,8 @@ import { ActivatedRoute } from '@angular/router';
 import { FormBuilder, Validators } from '@angular/forms';
 import { AuthService } from '@auth0/auth0-angular';
 import { HttpHeaders} from '@angular/common/http';
+
+
 @Component({
     selector: 'animal',
     templateUrl: './animal.component.html',
@@ -23,6 +25,8 @@ export class AnimalComponent {
     animalData:any;
     uploaderID: any;
     animalSummary: any; 
+    userID: any;
+    deleteButtonActive: boolean = false;
 
     ngOnInit(){
         
@@ -33,7 +37,7 @@ export class AnimalComponent {
             this.animalData = data;
             this.animalData = this.animalData
             this.uploaderID = this.animalData[0].userID;
-            
+            this.checkUser()
             console.log(this.animalData)
             this.webService.getUser(this.uploaderID).subscribe(data => {
                 this.uploaderInfo = data;
@@ -51,36 +55,36 @@ export class AnimalComponent {
               console.error(error);
             }
           );
+
+        
+    }
+
+    //Checks if user if the uploader, disables delete button if not
+    checkUser(){
+        //Gets token from header and decodes to get userID
+        let token = localStorage.getItem('token');
+        if (token){
+        this.webService.getUserID(token).subscribe((data: any) => {
+            this.userID=data;
+            if (this.userID==this.uploaderID){
+                this.deleteButtonActive = true;
+            }
+            else{
+                this.deleteButtonActive = false;
+            }
+        });
+        }
         
     }
     
     //Delete animal button
     onDelete(id:any){
         this.webService.delAnimal(id).subscribe((response:any)=> {
-            this.route.snapshot.params['id'];
+            this.animal_list = this.webService.getAnimals();
         });
-        this.animal_list = this.webService.getAnimals();
+        
     }
 
-
-    async exampleAsyncFunction() {
-        try {
-          var result = await this.webService.getAnimalWiki(this.route.snapshot.params['Species']);
-          this.animalSummary = result
-          this.animalSummary = this.animalSummary.summary
-          console.log(this.animalSummary);
-        } catch (error) {
-          console.error(error);
-        }
-      }
-      
-       longRunningFunction() {
-        return new Promise((resolve, reject) => {
-          setTimeout(() => {
-            resolve('Done!');
-          }, 3000);
-        });
-      }
       
       
 }

@@ -20,39 +20,9 @@ export class HomeComponent {
 
             
     ngOnInit(){
-      //Building login and signup forms
-       this.loginForm = this.formBuilder.group({
-         username: ['', Validators.required],
-         password: ['', Validators.required],
-       });
 
-       this.signupForm = this.formBuilder.group({
-        forename: ['', Validators.required],
-        surname: ['', Validators.required],
-        username: ['', Validators.required],
-        email: ['', Validators.required],
-        admin: ["false"],
-        password: ['', Validators.required],
-      });
      }
    
 
 
-     //Login button 
-     onSubmitLogin(){
-       const loginData = this.loginForm.value;
-       this.webService.signin(loginData)
-       this.loginForm.reset();
-
-     }
-
-    //Signup button 
-     onSubmitSignup(){
-      if (this.signupForm.valid){
-        this.webService.signup(this.signupForm.value);
-        this.signupForm.reset();
-        this.signupForm.reset();
-       }
-    }
-  
 }

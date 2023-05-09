@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import jwt_decode from 'jwt-decode';
 import WebService from "./web.service";
 
+
 @Component({
   selector: 'navigation',
   templateUrl: './nav.component.html',
@@ -11,8 +12,27 @@ import WebService from "./web.service";
 })
 
 export class NavComponent {
-    constructor(public authComponnt: AuthComponent, public router: Router, public webService: WebService) {}
+    constructor(public authComponnt: AuthComponent,
+                public router: Router, public webService: WebService) {}
 
+    showLogOut: boolean = false;
     
+
+    ngOnInit(){
+     this.checkIfUserLoggedIn()
+
+     
+   }
+    checkIfUserLoggedIn(){
+      let token;
+      token = localStorage.getItem('token');
+      if (token){
+        this.showLogOut = true;
+      }else{
+        this.showLogOut = false;
+      }
+    }
+
+
     
 }

@@ -239,7 +239,13 @@ def get_animalCol(collection):
 
     return make_response(jsonify(animals),200)
 
-
+#Get locations of all of species
+@app.route("/api/v1.0/animals/<string:collection>/query/location")
+def get_locationCollection(collection):
+    documents = animalDB[collection.title()].find({})
+    locations = [doc['Location'] for doc in documents if 'Location' in doc]
+    
+    return make_response(jsonify(locations),200)
 
 # REMINDER HENRY THIS IS NOT YOUR ACTUAL APP.PY THIS IS JUST FOR UPLOADING TO GITHUB
 # PLEASE REMEMBER TO UPDATE THE CODE IN HERE 

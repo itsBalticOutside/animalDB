@@ -3,7 +3,10 @@ import { BrowserModule } from '@angular/platform-browser';
 
 import { AppComponent } from './app.component';
 import { AnimalsComponent } from './animals.component';
+
 import WebService from './web.service';
+import { GMapService } from './g-map.service';
+
 import { HttpClientModule } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
 
@@ -20,6 +23,9 @@ import { AuthComponent } from './auth.component';
 import { LoginComponent } from './login.component';
 import { SignupComponent } from './signup.component';
 import { StatsPageComponent } from './stats-page.component';
+import { GMapsComponent } from './g-maps.component';
+import { GMapsGecodeComponent } from './g-maps-gecode.component';
+import { GMapsHeatlayerComponent } from './g-maps-heatlayer.component';
 
 
 
@@ -63,7 +69,10 @@ var routes: any = [
     AuthComponent,
     LoginComponent,
     SignupComponent,
-    StatsPageComponent
+    StatsPageComponent,
+    GMapsComponent,
+    GMapsGecodeComponent,
+    GMapsHeatlayerComponent
   ],
   imports: [
     BrowserModule, HttpClientModule,
@@ -77,7 +86,7 @@ var routes: any = [
       }
     })
   ],
-  providers: [WebService],
+  providers: [WebService,GMapService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

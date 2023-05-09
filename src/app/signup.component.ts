@@ -38,7 +38,7 @@ export class SignupComponent {
       if (this.signupForm.valid){
         this.webService.signup(this.signupForm.value);
         this.signupForm.reset();
-        this.signupForm.reset();
+        alert("Account Created!");
        }
     }
 

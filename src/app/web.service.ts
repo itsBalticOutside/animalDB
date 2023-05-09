@@ -43,6 +43,10 @@ export default class WebService {
     getAllGender(genderType:any) {
         return this.http.get('http://localhost:5000/api/v1.0/animals/query/gender/' + genderType);
     }
+
+    getLocationsOfSpecies(collection:any){
+        return this.http.get('http://localhost:5000/api/v1.0/animals/' + collection+ '/query/location');
+    }
     
     getAnimalWiki(collection: any){
         var animalSummary
@@ -179,6 +183,7 @@ export default class WebService {
     
     //Gets userID from decoding token in backend
     getUserID(token: string | string[]){ 
+        
         let headers = new HttpHeaders();
         headers = headers.set('x-access-token', token);
         return this.http.post('http://localhost:5000/api/v1.0/user/id',{}, { headers })

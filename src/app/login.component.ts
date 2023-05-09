@@ -4,7 +4,7 @@ import WebService from "./web.service";
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { timeout } from "d3";
-
+import { Router } from '@angular/router'
 
 @Component({
   selector: 'app-login',
@@ -19,7 +19,8 @@ export class LoginComponent {
 
 
     constructor(public authComponent: AuthComponent,public http: HttpClient,
-                public webService: WebService, private formBuilder: FormBuilder) {}
+                public webService: WebService, private formBuilder: FormBuilder,
+                public router :Router) {}
 
             
     ngOnInit(){
@@ -30,7 +31,8 @@ export class LoginComponent {
        });
        this.webService.signInSuccessEvent.subscribe((event: string) => {
         this.showMessage = true;
-        this.message = 'You have successfully signed in!';
+        const loginData = this.loginForm.value
+        this.message = 'You have successfully signed in! Welcome back ' + loginData.username;
       });
      }
    
@@ -42,15 +44,19 @@ export class LoginComponent {
       const loginData = this.loginForm.value;
       this.webService.signin(loginData)
       setTimeout(() => {
-        if (this.showMessage) {
+        if (!this.showMessage) {
+          alert("Login failed, please try again!");
+          
+          this.loading = false;
+          
+          
+        } else {
+          
+          this.router.navigate(['/animals']);
           this.loginForm.reset();
           this.loading = false;
-          alert("Welcome back, " + loginData.username + "!");
-        } else {
-          alert("Login failed, please try again!");
-          this.loading = false;
         }
-      },1500);
+      },1800);
      
   }
 

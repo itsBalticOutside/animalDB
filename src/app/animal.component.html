@@ -26,8 +26,11 @@
                          
                     </div>
 
-
+                    <!-- Species GenderCount BarChart -->
                     <app-bar [Species]=animal.Species></app-bar>
+
+
+
 
                     <div class="col-md-12">
                         <!-- Animal Wiki Information -->
@@ -38,6 +41,7 @@
                           <div class="card-body">
                             <div *ngIf="animalSummary; else loading">
                               <p class="card-text">{{ animalSummary.summary }}</p>
+                              <a [href] = "animalSummary.url"> Additonal Information </a>
                             </div>
                             <ng-template #loading>
                               <p>Loading animal wiki information...</p>
@@ -45,11 +49,12 @@
                           </div>
                         </div>
                 </div>
-                
-              
+                <app-g-maps></app-g-maps>
+                <app-g-maps-gecode [PostCode]="animal.Location"></app-g-maps-gecode>
+                <app-g-maps-heatlayer [Specie] = "animal.Species"></app-g-maps-heatlayer>
               <br>
               <!--Delete button-->
-              <button type="delete" class= "btn btn-primary" (click)="onDelete(animal._id)" [routerLink]="['/animals']">Delete</button> 
+              <button type="delete" class= "btn btn-primary" [disabled]="!deleteButtonActive" (click)="onDelete(animal._id)" [routerLink]="['/animals']">Delete</button> 
 
             </div>
         </div>

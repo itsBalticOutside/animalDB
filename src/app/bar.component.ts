@@ -21,6 +21,8 @@ export class BarComponent {
 
 //Input to retrieve Species
   @Input() Species: any;
+// Create unique ID for bar - Bar object is removed from componet after creation 
+// ... but is still drawn on page
   id: string = 'bar-' + Math.random().toString(36).substr(2, 5);
 
   private drawBars(data: any[]): void {
