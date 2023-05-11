@@ -11,8 +11,15 @@
       <div class="col-md-6">
         <!-- Map and related components -->
         <app-g-maps></app-g-maps>
+        <!-- Display map elements for authenticated users -->
+        <div *ngIf="this.webService.isLogged; else loginMessage">
         <app-g-maps-gecode [PostCode]="animal.Location"></app-g-maps-gecode>
         <app-g-maps-heatlayer [Specie]="animal.Species"></app-g-maps-heatlayer>
+        </div>
+        <ng-template #loginMessage>
+          <!-- Display login message for non-authenticated users -->
+          <p><strong>Please log in to access Map featues and location Info.</strong> </p>
+        </ng-template>
       </div>
     </div>
   </div>

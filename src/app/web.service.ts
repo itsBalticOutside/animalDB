@@ -13,39 +13,59 @@ export default class WebService {
     constructor(public http: HttpClient, public router : Router) {}
     private userID:any;
     signInSuccessEvent = new EventEmitter<string>();
+    public isLogged = false;
+
+    //@ts-ignore
+    getToken(){
+        let headers = new HttpHeaders();
+        let token = localStorage.getItem('token');
+        if (token) {
+        headers = headers.set('x-access-token', token);
+        return headers;
+        }
+    }
+
     //Getting Animal/Animalss
     getAnimals() {
-        return this.http.get('http://localhost:5000/api/v1.0/animals/');
+        var headers = this.getToken();
+        return this.http.get('http://localhost:5000/api/v1.0/animals/' , {headers});
         }
 
     getAnimal(collection:any ,id: any) {
         this.animalID = id;
+        var headers = this.getToken();
         const url = 'http://localhost:5000/api/v1.0/animals/' + collection+"/"+id;
-        return this.http.get(url , {});
+        return this.http.get(url , {headers});
     }
 
     getAnimalUserProfile(id: any) {
         this.animalID = id;
+        var headers = this.getToken();
         const url = 'http://localhost:5000/api/v1.0/animal/' + id;
-        return this.http.get(url , {});
+        return this.http.get(url , {headers});
     }
 
     getCollection(collection:any) {
-        return this.http.get('http://localhost:5000/api/v1.0/animals/' + collection);
+        var headers = this.getToken();
+        return this.http.get('http://localhost:5000/api/v1.0/animals/' + collection, {headers});
     }
     getCollections() {
-        return this.http.get('http://localhost:5000/api/v1.0/collections');
+        var headers = this.getToken();
+        return this.http.get('http://localhost:5000/api/v1.0/collections', {headers});
     }
 
     getCollectionOfGender(collection:any,genderType:any) {
-        return this.http.get('http://localhost:5000/api/v1.0/animals/' + collection + '/query/gender/' + genderType);
+        var headers = this.getToken();
+        return this.http.get('http://localhost:5000/api/v1.0/animals/' + collection + '/query/gender/' + genderType, {headers});
     }
     getAllGender(genderType:any) {
-        return this.http.get('http://localhost:5000/api/v1.0/animals/query/gender/' + genderType);
+        var headers = this.getToken();
+        return this.http.get('http://localhost:5000/api/v1.0/animals/query/gender/' + genderType , {headers});
     }
 
     getLocationsOfSpecies(collection:any){
-        return this.http.get('http://localhost:5000/api/v1.0/animals/' + collection+ '/query/location');
+        var headers = this.getToken();
+        return this.http.get('http://localhost:5000/api/v1.0/animals/' + collection+ '/query/location' , {headers});
     }
     
     getAnimalWiki(collection: any){
@@ -59,11 +79,7 @@ export default class WebService {
     //Posting Animal
     postAnimal(animal:any){
         //Gets jwt token from header for token auth
-        let headers = new HttpHeaders();
-        let token = localStorage.getItem('token');
-        if (token) {
-        headers = headers.set('x-access-token', token);
-        }
+        var headers = this.getToken();
         //Posts form data to backend
         let postData = new FormData();
         postData.append("Species", animal.Species);
@@ -88,11 +104,7 @@ export default class WebService {
     //Delete Animal
     delAnimal(id:any){
         //Gets jwt token from header for token auth
-        let headers = new HttpHeaders();
-        let token = localStorage.getItem('token');
-        if (token) {
-        headers = headers.set('x-access-token', token);
-        }
+        var headers = this.getToken();
         this.animalID = id;
         return this.http.delete('http://localhost:5000/api/v1.0/animal/' + this.animalID, {headers});
     }
@@ -120,6 +132,7 @@ export default class WebService {
               //Adds jwt token to local storage
               this.token = response;
               localStorage.setItem('token', this.token['token'])
+              this.isLogged = true;
               this.signInSuccessEvent.emit('success');
             },
             (error) => {
@@ -155,12 +168,12 @@ export default class WebService {
         let headers = new HttpHeaders();
         let token = localStorage.getItem('token');
         if (token) {
-            console.log("yeoo loggin out")
             headers = headers.set('x-access-token', token);
             return this.http.get('http://localhost:5000/api/v1.0/user/signout',{headers}).subscribe(
             (response) => {
               console.log(response);
               localStorage.removeItem('token')
+              this.isLogged = false;
               this.router.navigate(['']);
             },
             (error) => {

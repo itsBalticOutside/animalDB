@@ -19,19 +19,11 @@ export class NavComponent {
     
 
     ngOnInit(){
-     this.checkIfUserLoggedIn()
+     
 
      
    }
-    checkIfUserLoggedIn(){
-      let token;
-      token = localStorage.getItem('token');
-      if (token){
-        this.showLogOut = true;
-      }else{
-        this.showLogOut = false;
-      }
-    }
+    
 
 
     

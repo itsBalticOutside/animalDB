@@ -14,7 +14,7 @@ import { HttpHeaders} from '@angular/common/http';
 export class AnimalComponent { 
     //Initilizing variables
     
-    constructor(private webService: WebService, 
+    constructor(public webService: WebService, 
                 private route: ActivatedRoute,
                 private formBuilder: FormBuilder,
                 public authService: AuthService) {}
@@ -55,6 +55,7 @@ export class AnimalComponent {
               console.error(error);
             }
           );
+
 
         
     }

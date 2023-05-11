@@ -22,7 +22,7 @@
     <!--Login/Logout Button-->
     <div class="form-inline ms-auto" style = "margin-right:10px;">
         
-            <button class="btn btn-outline-light" *ngIf="showLogOut" (click) = "webService.logout()">Logout</button>
+            <button class="btn btn-outline-light" *ngIf="this.webService.isLogged" (click) = "webService.logout()">Logout</button>
  
 
     </div>
