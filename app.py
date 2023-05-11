@@ -205,15 +205,16 @@ def get_userUploads(userID):
 
 #Sign user out
 @app.route("/api/v1.0/user/signout", methods=['GET'])
-@jwt_required
 def logout():
-    token = request.headers['x-access-token']
-    blacklist.insert_one({"token":token})
-    
-    return make_response( jsonify( { 'message' : 'Logout successful'}), 200)
+    token = request.headers.get('x-access-token')
+    if token:
+        blacklist.insert_one({"token":token})
+        return make_response( jsonify( { 'message' : 'Logout successful'}), 200)
+    else:
+        return make_response( jsonify( { 'error' : 'Missing token' }), 401)
 
 #Get signed in users userID
-@app.route("/api/v1.0/user/id", methods=['POST'])
+@app.route("/api/v1.0/user/id", methods=['GET'])
 @jwt_required
 def getUserID():
     #Getting userID from jwt token
@@ -230,45 +231,50 @@ def getUserID():
 #Get collection of animals
 @app.route("/api/v1.0/animals/<string:collection>")
 def get_animalCol(collection):
-    
     # Retrieve all animals from the Specific collection
     #.title() is to ensure that for example if "deer" is typed, that it is changed to "Deer" so can find collection
     animals = list(animalDB[collection.title()].find())
-    for animal in animals:
-        animal["_id"] = str(animal["_id"])
-
-    return make_response(jsonify(animals),200)
+    if animals:
+        for animal in animals:
+            animal["_id"] = str(animal["_id"])
+        return make_response(jsonify(animals),200)
+    else:
+        return make_response( jsonify( { 'error' : 'Invalid Collection' }), 404)
 
 #Get locations of all of species
 @app.route("/api/v1.0/animals/<string:collection>/query/location")
 def get_locationCollection(collection):
     documents = animalDB[collection.title()].find({})
-    locations = [doc['Location'] for doc in documents if 'Location' in doc]
-    
-    return make_response(jsonify(locations),200)
+    if documents:
+        locations = [doc['Location'] for doc in documents if 'Location' in doc]
+        return make_response(jsonify(locations),200)
+    else:
+        return make_response( jsonify( { 'error' : 'Invalid Collection' }), 404)
 
 # REMINDER HENRY THIS IS NOT YOUR ACTUAL APP.PY THIS IS JUST FOR UPLOADING TO GITHUB
 # PLEASE REMEMBER TO UPDATE THE CODE IN HERE 
 
 #Get gender count of collection
 @app.route("/api/v1.0/animals/<string:collection>/query/genderCount")
-
 def get_genderCount(collection):
-   
     pipeline = [    {"$group": {"_id": "$Gender", "genderCount": {"$sum": 1}}}]
-
     genderCount = list(animalDB[collection.title()].aggregate(pipeline))
-
-    return make_response(jsonify(genderCount),200)
+    if genderCount:
+        return make_response(jsonify(genderCount),200)
+    else:
+        return make_response( jsonify( { 'error' : 'Invalid Collection' }), 404)
 
 #Get animals of specific gender and collection
 @app.route("/api/v1.0/animals/<string:collection>/query/gender/<string:genderType>")
-
 def get_genderCollection(collection,genderType):
-    animals = list(animalDB[collection.title()].find({"Gender": genderType.title()}))
-    for animal in animals:
-        animal["_id"] = str(animal["_id"])
-    return make_response(jsonify(animals),200)
+    animals = list(animalDB[collection.title()].find())
+    if animals:
+        animals = list(animalDB[collection.title()].find({"Gender": genderType.title()}))
+        for animal in animals:
+            animal["_id"] = str(animal["_id"])
+        return make_response(jsonify(animals),200)
+    else:
+        return make_response( jsonify( { 'error' : 'Invalid Collection' }), 404)
 
 #Get animals of specific gendder all collections
 @app.route("/api/v1.0/animals/query/gender/<string:genderType>")
@@ -368,8 +374,7 @@ def get_animalUserProfile(id):
 @jwt_required
 def add_animal():
     #Ensuring no missing form fields
-    if "Species" in request.form and \
-        "Gender" in request.form and \
+    if  "Gender" in request.form and \
         "LifeStage" in request.form and \
         "Location" in request.form and \
         "image" in request.form:

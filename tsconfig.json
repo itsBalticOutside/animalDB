@@ -22,7 +22,11 @@
     "lib": [
       "ES2022",
       "dom"
-    ]
+    ],
+    "skipLibCheck": true,
+    "typeRoots": [
+      "node_modules/@types",
+  ]
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,

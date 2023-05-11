@@ -32,7 +32,13 @@ class imageUpload:
 
         
         print("This animal is most likely " + animals[0])
-        return animals[0]
+
+        finalPrediction = animals[0]
+        #If prediction less than 30% then return as UNIDENTIFIED
+        if finalPrediction < 0.3:
+            return "UNIDENTIFIED"
+        else:
+            return animals[0]
     
     def getPrediction(image_path):
 

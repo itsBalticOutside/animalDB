@@ -28,7 +28,6 @@ export class UserProfileComponent {
         this.userID=data;
         //Using userID, gets user document
         this.webService.getUser(this.userID).subscribe(data => {
-          console.log("getting user")
           this.userInfo = data;
           this.userInfo = this.userInfo[0]
           //Gets uploadIDs from user profile
@@ -49,7 +48,6 @@ export class UserProfileComponent {
 
   //Goes through all uploadIDs associated with profile and adds to list
   async getAnimalsFromUploadIDs(userUploads: any) {
-
         for (const id of userUploads) {
           const animal = await this.webService.getAnimalUserProfile(id).toPromise();
           this.animals = this.animals.concat(animal);
@@ -57,9 +55,8 @@ export class UserProfileComponent {
         return this.animals;
   }
     
-    
   onEditForm() {
-    
+    //Check for open form element
     if (this.isEditFormOpen == false){
       this.isEditFormOpen = true;
       console.log(this.userInfo)
@@ -80,15 +77,12 @@ export class UserProfileComponent {
       // Hide the form
         //@ts-ignore
         document.getElementById('editForm').style.display = 'none'
-    }
-      
+    }   
   }
-      
     
   onEdit(){
     if (this.editForm.valid){
       // Get the new values from the form
-      
       const forename = this.editForm.get("Forename").value;
       const surname = this.editForm.value.Surname;
       const email = this.editForm.value.Email;
@@ -102,18 +96,14 @@ export class UserProfileComponent {
       this.webService.editUser(this.userID,this.editForm.value).subscribe((response:any) =>{
         this.editForm.reset();
         this.webService.getUser(this.userID).subscribe(data => {
-          console.log("getting user")
           this.userInfo = data;
           this.userInfo = this.userInfo[0]
-          
         });
         // Hide the form
         //@ts-ignore
         document.getElementById('editForm').style.display = 'none'
       });
     }
-  
   }
-
 
 }

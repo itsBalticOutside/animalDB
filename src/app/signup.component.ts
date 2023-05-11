@@ -19,20 +19,17 @@ export class SignupComponent {
 
             
     ngOnInit(){
-      //Building login and signup forms
-
-
+      //Building signup form
        this.signupForm = this.formBuilder.group({
         forename: ['', Validators.required],
         surname: ['', Validators.required],
         username: ['', Validators.required],
-        email: ['', Validators.required],
+        email: ['', Validators.required, Validators.email],
         admin: ["false"],
         password: ['', Validators.required],
       });
      }
-   
-
+  
     //Signup button 
      onSubmitSignup(){
       if (this.signupForm.valid){

@@ -13,26 +13,25 @@
     </div>
 </div> 
 <div class ="container">
-  <div>
-    <form [formGroup]="filterForm" (ngSubmit)="onFilter()">
-    <label for="Species">Species</label>
+    <div>
+        <!-- Filter Buttons -->
+        <form [formGroup]="filterForm" (ngSubmit)="onFilter()">
+            <label for="Species">Species</label>
+            <select id="Species" Species="Species" [(ngModel)]="selectedSpecies " formControlName="Species" >
+                <option value="">All Species</option>
+                <option *ngFor = "let Species of collectionName | async" [value]="Species">{{ Species }}</option>
+            </select>
+            <label for="Gender">Gender</label>
+            <select id="Gender" Species="Gender" [(ngModel)]="selectedGender " formControlName="Gender" >
+                <option value="">All Genders</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+            </select>
+            <button type="submit">Filter</button>
+        </form>
+    </div>
 
-    <select id="Species" Species="Species" [(ngModel)]="selectedSpecies " formControlName="Species" >
-      <option value="">All Species</option>
-      <option *ngFor = "let Species of collectionName | async" [value]="Species">{{ Species }}</option>
-    </select>
-    <label for="Gender">Gender</label>
-    <select id="Gender" Species="Gender" [(ngModel)]="selectedGender " formControlName="Gender" >
-        <option value="">All Genders</option>
-        <option value="Male">Male</option>
-        <option value="Female">Female</option>
-        
-      </select>
-    <button type="submit">Filter</button>
-</form>
-</div>
 <!--Aniamls card Group-->
-
     <div class="row">
         <div class="card-group">
             <div  class="col-sm-3" style ="padding: 5px;" *ngFor = "let animal of animal_list | async">
@@ -46,12 +45,8 @@
                         <br>
                         Location: {{animal.Location}}
                     </div>
-
                 </div>
-                
             </div>
-        </div>
-        
+        </div> 
     </div>
-
 </div>

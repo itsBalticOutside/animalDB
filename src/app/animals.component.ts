@@ -47,29 +47,20 @@ export class AnimalsComponent {
     }
 
     onFilter() {
+        //Get filter selections
         this.selectedSpecies = this.filterForm.get('Species').value;
-        this.selectedGender = this.filterForm.get('Gender').value;
-        console.log("selected species: " + this.selectedSpecies);
-        console.log("selected gebder: " + this.selectedGender);
-        
-            
-
+        this.selectedGender = this.filterForm.get('Gender').value;   
+            // Filter Logic - Show all animals
         if (this.selectedSpecies === null && this.selectedGender === null) {
-
-            // Show all animals
             this.animal_list = this.webService.getAnimals();
-
-          } else if (this.selectedSpecies !== null && this.selectedGender === '') {
-
             // Show selected species
+          } else if (this.selectedSpecies !== null && this.selectedGender === '') {
             this.animal_list = this.webService.getCollection(this.selectedSpecies);
-
-          } else if (this.selectedSpecies === null && this.selectedGender !== '') {
-
             // Show all animals with selectedGender
+          } else if (this.selectedSpecies === null && this.selectedGender !== '') {
             this.animal_list = this.webService.getAllGender(this.selectedGender);
-          } else if (this.selectedSpecies !== null && this.selectedGender !== '') {
             // Show all animals with selected species and selected gender
+          } else if (this.selectedSpecies !== null && this.selectedGender !== '') {
             this.animal_list = this.webService.getCollectionOfGender(this.selectedSpecies,this.selectedGender);
           } else {
             // Handle other cases

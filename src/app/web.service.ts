@@ -186,7 +186,7 @@ export default class WebService {
         
         let headers = new HttpHeaders();
         headers = headers.set('x-access-token', token);
-        return this.http.post('http://localhost:5000/api/v1.0/user/id',{}, { headers })
+        return this.http.get('http://localhost:5000/api/v1.0/user/id',{headers})
     }
 
     //Uses userID to retrieve user uplaods !!Not in use!!
